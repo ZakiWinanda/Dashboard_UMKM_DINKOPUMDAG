@@ -1,0 +1,668 @@
+-- phpMyAdmin SQL Dump
+-- version 4.8.5
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1:3306
+-- Generation Time: Aug 19, 2026 at 02:45 AM
+-- Server version: 5.7.26
+-- PHP Version: 5.6.40
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `monev_swk`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `koordinator_pendamping`
+--
+
+DROP TABLE IF EXISTS `koordinator_pendamping`;
+CREATE TABLE IF NOT EXISTS `koordinator_pendamping` (
+  `nip_koordinator` char(30) NOT NULL,
+  `nip_pendamping` char(50) NOT NULL,
+  PRIMARY KEY (`nip_koordinator`,`nip_pendamping`) USING BTREE,
+  KEY `nip_pendamping` (`nip_pendamping`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `koordinator_pendamping`
+--
+
+INSERT INTO `koordinator_pendamping` (`nip_koordinator`, `nip_pendamping`) VALUES
+('197507152009011001', '197507152009011001'),
+('199402242025211078', '197510042025211027'),
+('198112042025211044', '198112042025211044'),
+('197507152009011001', '198212252025211060'),
+('198308222025211035', '198305112025211091'),
+('198308222025211035', '198308132025211061'),
+('198308222025211035', '198308222025211035'),
+('198606212025211120', '198606212025211120'),
+('197507152009011001', '198802242025211061'),
+('199402242025211078', '198806062025211153'),
+('199402242025211078', '199106172025211084'),
+('198112042025211044', '199108032025212098'),
+('198308222025211035', '199108212025212056'),
+('199402242025211078', '199306132025211057'),
+('199402242025211078', '199402242025211078'),
+('198112042025211044', '199408062025212069'),
+('198606212025211120', '199506132025212085'),
+('197507152009011001', '199512062025211064'),
+('199402242025211078', '199605122025212075'),
+('199402242025211078', '199606062025212110'),
+('198606212025211120', '199610172025212060'),
+('198308222025211035', '199612082025212088'),
+('198606212025211120', '199708192025212066');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `m_indikator`
+--
+
+DROP TABLE IF EXISTS `m_indikator`;
+CREATE TABLE IF NOT EXISTS `m_indikator` (
+  `idindikator` varchar(36) NOT NULL,
+  `kode` varchar(50) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `tipe` enum('number','text','radio','multi') NOT NULL,
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `urut` int(11) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `bobot` decimal(5,0) NOT NULL DEFAULT '0',
+  `parent_id` char(36) DEFAULT NULL,
+  PRIMARY KEY (`idindikator`),
+  UNIQUE KEY `kode` (`kode`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `m_indikator`
+--
+
+INSERT INTO `m_indikator` (`idindikator`, `kode`, `nama`, `tipe`, `aktif`, `urut`, `created_at`, `bobot`, `parent_id`) VALUES
+('54dafcd5-b44a-480f-944a-75cbdf1920fe', 'kebersihan_area_parkir', 'Kebersihan Area Parkir', 'radio', 1, 13, '2026-07-09 16:53:43', '0', 'tingkat_kebersihan'),
+('64b8d754-e4c9-4d06-9178-fd912ae909b1', 'kebersihan_tenan', 'Kebersihan Tenan', 'radio', 1, 11, '2026-07-09 16:47:59', '0', 'tingkat_kebersihan'),
+('82f681f4-59c6-4312-bb89-69a6ea4533b2', 'lahan_parkir', 'Adakah Lahan Parkir?', 'radio', 1, 16, '2026-07-11 19:58:18', '0', 'tingkat_kebersihan'),
+('923a7563-2465-4baf-9225-87431afd010b', 'juru_parkir', 'Ada Tidak Juru Parkir?', 'radio', 1, 17, '2026-07-11 19:59:15', '0', 'tingkat_kebersihan'),
+('95e0569a-ca6e-4a1d-8220-252bf644724f', 'kebersihan_toilet', 'Kebersihan Toilet Baik', 'radio', 1, 12, '2026-07-09 16:51:35', '0', 'tingkat_kebersihan'),
+('c8615d2f-e605-4f99-9d5f-8126f33455ea', 'sampah_terpilah', 'Apakah Sampah Terpilah?', 'radio', 1, 15, '2026-07-11 19:57:14', '0', 'tingkat_kebersihan'),
+('c8c93695-07d2-4bd3-b1fe-3fd1198dc012', 'kebersihan_produk_makanan', 'Kebersihan Produk Makanan', 'radio', 1, 14, '2026-07-09 16:55:38', '0', 'tingkat_kebersihan'),
+('f9fe494d-7522-11f1-92f4-0040b87d9637', 'tingkat_keterisian_stan', 'Tingkat Keterisian Stan SWK', 'number', 1, 1, '2026-07-01 15:00:57', '15', NULL),
+('f9fe5494-7522-11f1-92f4-0040b87d9637', 'kenaikan_omset', 'Kenaikan Omset', 'number', 1, 2, '2026-07-01 15:00:57', '15', NULL),
+('f9fe5605-7522-11f1-92f4-0040b87d9637', 'kelengkapan_administrasi', 'Kelengkapan Administrasi', 'multi', 1, 3, '2026-07-01 15:00:57', '15', NULL),
+('f9fe570b-7522-11f1-92f4-0040b87d9637', 'promosi', 'Promosi', 'text', 1, 4, '2026-07-01 15:00:57', '15', NULL),
+('f9fe5891-7522-11f1-92f4-0040b87d9637', 'tingkat_kebersihan', 'Tingkat Kebersihan', 'radio', 1, 5, '2026-07-01 15:00:57', '8', NULL),
+('f9fe59a4-7522-11f1-92f4-0040b87d9637', 'frekuensi_kunjungan', 'Frekuensi Kunjungan', 'number', 1, 6, '2026-07-01 15:00:57', '8', NULL),
+('f9fe5aa0-7522-11f1-92f4-0040b87d9637', 'pemberian_ide_praktis', 'Pemberian Ide Praktis', 'text', 1, 7, '2026-07-01 15:00:57', '8', NULL),
+('f9fe5b9e-7522-11f1-92f4-0040b87d9637', 'review_online', 'Review Online', 'radio', 1, 8, '2026-07-01 15:00:57', '8', NULL),
+('f9fe5cb9-7522-11f1-92f4-0040b87d9637', 'rapat_evaluasi', 'Rapat Evaluasi', 'text', 1, 9, '2026-07-01 15:00:57', '8', NULL),
+('fef41c0b-f25a-4915-bfc7-e7af7f6db632', 'kebersihan_ruang_makan', 'Kebersihan Ruan Makan', 'radio', 1, 10, '2026-07-09 16:45:21', '0', 'tingkat_kebersihan');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `m_omset`
+--
+
+DROP TABLE IF EXISTS `m_omset`;
+CREATE TABLE IF NOT EXISTS `m_omset` (
+  `idomset` char(36) NOT NULL,
+  `idswk` varchar(100) NOT NULL,
+  `tahun` smallint(6) NOT NULL,
+  `bulan` tinyint(2) NOT NULL,
+  `omset` decimal(18,0) NOT NULL DEFAULT '0',
+  `omset_plus_1` decimal(18,0) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` varchar(30) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`idomset`),
+  UNIQUE KEY `uniq_omset` (`idswk`,`tahun`,`bulan`),
+  KEY `idx_tahun_bulan` (`tahun`,`bulan`),
+  KEY `idx_idswk` (`idswk`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `m_omset`
+--
+
+INSERT INTO `m_omset` (`idomset`, `idswk`, `tahun`, `bulan`, `omset`, `omset_plus_1`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES
+('01a2a7ae-e01c-464c-b260-3cbfcd3f467f', 'afbca506-0a6b-4690-94e4-fd0d2783d766', 2026, 6, '44733000', '45180330', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('024dcd57-50f1-4b93-862f-a2186b67a100', '73ec872a-5efc-419a-b5b5-89a96ed39091', 2026, 6, '87016000', '87886160', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('02e481fd-a4e2-4433-8267-07c4400d0e38', '34d924e8-e8a1-4eb6-b679-33c27cfa87c0', 2026, 6, '61019900', '61630099', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('0fb0cfcf-1358-49c5-b7e1-47b11d90d2fe', '0d79867d-8d8e-415e-8147-a86abbd616ca', 2026, 6, '315479680', '318634477', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('1262af5e-8d97-48df-853a-312e84a1800e', '16377e96-6a23-42c6-a5bf-33444cb475f0', 2026, 6, '170150000', '171851500', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('1e06daf3-12d1-4412-8d98-cfea6944719c', '2de9745c-a2c5-4b16-977d-2fc8ab722f6f', 2026, 6, '247851918', '250330437', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('1f01caa1-45cf-4edb-8356-12c29b75bf30', '6bdad473-586a-49fb-a621-f2944c6cd1e5', 2026, 6, '540221960', '545624180', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('23428e17-f2f4-43e7-bdcb-7fca424a4b12', '2b4d6bd1-edaa-4194-b32b-39c50eacc47b', 2026, 6, '54350000', '54893500', '2026-07-10 09:20:11', NULL, NULL, NULL),
+('262c2723-2800-4186-9238-29e29ec9801e', '06e47c44-0980-4bae-835e-c8af860710a7', 2026, 6, '51879000', '52397790', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('26d20c6a-af94-4d93-9520-07ac5469afcc', 'f6265a8f-0162-4184-9b63-dd8f90c54459', 2026, 6, '31450000', '31764500', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('29910611-dbf7-4563-a392-4b80ebbc4068', '54daa1e6-529e-446c-a8e0-ebded9e0e3b7', 2026, 6, '162666000', '164292660', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('2cacdc3a-7cc2-446d-a630-5b15c79a5324', '59ffc322-2189-432c-996a-7e0d35d8d786', 2026, 6, '88151000', '89032510', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('2cb3d8c0-69d7-4505-98f7-646df6bc3610', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b', 2026, 7, '45000000', '45450000', '2026-07-15 07:44:02', NULL, NULL, NULL),
+('2da6303b-3c46-497f-8a74-1dae45990124', 'ef94d996-31b7-4dab-b42c-0d001d44e525', 2026, 6, '61580000', '62195800', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('2eaf1b7d-6f63-4c71-8a6e-4aa8c060bd0b', 'ec0d209b-3d5a-466c-946a-7c0ad1e64f40', 2026, 6, '77151000', '77922510', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('32a13898-d71f-4a76-a752-01727ca06426', '014aa9e8-b45a-4328-9d27-47c332b76f5b', 2026, 6, '103444000', '104478440', '2026-07-10 09:20:11', NULL, NULL, NULL),
+('3fa0ee33-264f-402a-8063-d16f5e4587ef', 'ea849a4b-5009-4900-a115-bf412cd037bc', 2026, 6, '47540857', '48016266', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('41f0eb3e-f1c0-4ad2-8782-61155cdf0a93', '35c7938a-7229-458e-ab43-ee5d175393c9', 2026, 6, '0', '0', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('4c3f262f-2c3e-4980-a99b-75d70260b221', '56f83d8a-6c5a-45b8-b3e3-87be24ca5468', 2026, 6, '160375000', '161978750', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('554613d8-33f6-4e1b-b709-c815ee951e2e', 'f6265a8f-0162-4184-9b63-dd8f90c54459', 2026, 7, '33000000', '33330000', '2026-07-15 07:44:46', NULL, NULL, NULL),
+('583dc983-06ba-419b-a6ec-b44ad297f12', '12e33321-4c1c-4f55-9b86-5620ea833e61', 2026, 6, '15630000', '15786300', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('58db3345-17c6-4062-812a-d21a26b5cdf3', '17c88952-1a47-462e-a543-840fc5199e27', 2026, 6, '9577000', '9672770', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('5eccdcbf-4ac0-4f06-81b7-8eb0e6976b16', 'ef88a9ab-3178-4fba-b2da-b959a746b7bf', 2026, 6, '71857000', '72575570', '2026-07-10 09:20:11', NULL, NULL, NULL),
+('5f65886f-fcf0-41bf-bbc8-b20459f28136', 'd4aa9241-eaad-4799-8da8-e3704b543827', 2026, 6, '163692000', '165328920', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('667adbc0-d4c4-4fb9-a0ee-dfcd867747c', 'e29e3066-313a-44cb-9b60-3927c84959d9', 2026, 6, '55526000', '56081260', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('6d290296-54b6-4c61-98f5-6f8b04bcf5a1', '67d95c2a-75a5-40ff-a3fe-47224e62e386', 2026, 6, '48445600', '48930056', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('6e4bd4ff-f36a-4eeb-808d-96b87ee6b59a', 'f485b575-c30d-4cd6-a049-2540a2a2e982', 2026, 6, '51580000', '52095800', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('70768182-8fc8-49f7-9f30-9f98e5b3fd49', 'a64892c5-970b-413b-a492-234dc31cb8d3', 2026, 6, '45018000', '45468180', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('7c91e153-2a94-4e29-99c7-31da10f2f19b', '22b34dc0-c15a-4f91-86ef-f06d8ef26600', 2026, 6, '70685000', '71391850', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('7e7ea279-6cb1-4045-9bf6-1b3260a2d255', 'c275c120-243b-4e2e-a816-2c3db5247ddf', 2026, 6, '40416000', '40820160', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('8085f298-0318-4e7a-abee-0ad9bd6fabad', '35da3184-b599-4eff-b931-96d77abdced0', 2026, 6, '28677000', '28963770', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('82c26c00-2114-453c-a21b-94973c68a6b', '8277f1b3-cf0e-4603-8c76-d58dd6107cb5', 2026, 6, '34519000', '34864190', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('861a81ea-b191-4d32-b60b-21847141e6e8', '348a1ce5-cb89-4f0b-87c5-b5629193018a', 2026, 6, '439059000', '443449590', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('881a9eac-970e-426d-9769-2a018dead757', '1cfe19ed-e6ae-41c8-aa18-cf10f8fee7e7', 2026, 7, '350000000', '353500000', '2026-07-16 15:38:50', NULL, NULL, NULL),
+('8f80aeeb-c5db-451b-9fcc-916c9ee06e5f', '8d73805d-edc2-43d3-bf19-c69c2761608c', 2026, 6, '45290000', '45742900', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('91a6828a-148d-487b-afd9-2533a91cfe0a', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b', 2026, 6, '41240000', '41652400', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('961fec7f-8a7c-4df6-8f0b-1162a8ec56f5', '9885cd19-f244-476b-995d-7175b1a893ab', 2026, 6, '396385000', '400348850', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('a3dd7fb8-05a0-4994-8460-f5a5869aabea', '0b7f73aa-bb49-47f9-82bd-2d3607b45641', 2026, 6, '172928000', '174657280', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('ab8a647e-509d-4379-ac97-445a4541fa8d', 'af19105e-3a47-4aeb-91ea-155dbd68a060', 2026, 6, '64678000', '65324780', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('b006102c-83b6-467d-b571-11341e5c1efc', '6223244b-0fc5-485d-989d-96de9dd708d2', 2026, 6, '56946000', '57515460', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('b2ecbf0d-677c-46e3-9471-9a275d34779', 'ba46bed2-cbb6-41fa-9b34-4d9c1e720387', 2026, 6, '348464000', '351948640', '2026-07-10 09:20:08', NULL, NULL, NULL),
+('bc781cc0-7a11-4777-bb28-e3fd027850b1', '77f0732d-46e6-47e9-84c6-1d12957af02a', 2026, 6, '19629000', '19825290', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('c173d989-3e58-47ef-a07b-9a6c77906269', '3931e48d-f076-4126-a359-5e3874140efe', 2026, 6, '95522000', '96477220', '2026-07-10 09:20:11', NULL, NULL, NULL),
+('c21a1a55-78e1-4aab-9b04-63d4fd5e8b11', 'b4fd4827-3c7b-434e-8594-74740f656b62', 2026, 6, '64834200', '65482542', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('c7512bbe-0efc-4a9c-9fec-685f5a558cdb', '14b8fc6a-5f8d-4efa-9125-6e074aea9afa', 2026, 6, '15243000', '15395430', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('cc3f5d82-9603-4827-9145-6cf08f2af382', 'a96bf285-1495-48a9-93e5-9843cb434057', 2026, 6, '24505000', '24750050', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('d3358906-e958-4d77-b3a3-e0e637195426', '1cfe19ed-e6ae-41c8-aa18-cf10f8fee7e7', 2026, 6, '340520000', '343925200', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('d421807d-76ea-432e-a86d-8ef3485e189c', '8dc6d573-5b13-4988-986d-d4f0db6d0fa6', 2026, 6, '9897000', '9995970', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('d8b1755f-2f5d-4b89-a9ec-75f93af01102', '6654a5d7-de8a-4cb8-ab5b-b39c33e1dc1b', 2026, 6, '75717000', '76474170', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('dd5839ed-31d2-4a78-8e11-101d39de2a84', '9560c948-dbca-47fa-b3eb-8586d6f2f009', 2026, 6, '68946000', '69635460', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('e8cd1a3b-2d0d-4fcd-b1ac-e740cf50c1aa', '95d495af-b0f7-44e4-aa79-3606b38cd4eb', 2026, 6, '68964000', '69653640', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('ebbc50c7-4a80-4e8d-9850-1c9abcf604be', '13b6af7f-5e52-4544-b648-db0998a0e4fa', 2026, 6, '109155600', '110247156', '2026-07-10 09:20:10', NULL, NULL, NULL),
+('f139f966-558e-4614-9031-e0c9e85b5e0f', '23eadf72-9b85-49b1-b951-ea1836fdcadc', 2026, 6, '88587000', '89472870', '2026-07-10 09:20:09', NULL, NULL, NULL),
+('f4f654ca-8ea8-4c1b-a2a9-a8521a72b913', '4bba05ab-8883-4f47-8173-031c4ef2f449', 2026, 6, '64728000', '65375280', '2026-07-10 09:20:10', NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `m_swk`
+--
+
+DROP TABLE IF EXISTS `m_swk`;
+CREATE TABLE IF NOT EXISTS `m_swk` (
+  `idswk` varchar(100) NOT NULL,
+  `urutan` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_swk` varchar(100) DEFAULT NULL,
+  `alamat` varchar(100) DEFAULT NULL,
+  `stan` int(11) NOT NULL DEFAULT '0',
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idswk`),
+  UNIQUE KEY `uk_urutan` (`urutan`)
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `m_swk`
+--
+
+INSERT INTO `m_swk` (`idswk`, `urutan`, `nama_swk`, `alamat`, `stan`, `aktif`, `created_at`) VALUES
+('014aa9e8-b45a-4328-9d27-47c332b76f5b', 52, 'SWK TERMINAL MANUKAN', 'JL. CANDI LONTARNO 1', 24, 1, '2026-07-01 08:55:14'),
+('06e47c44-0980-4bae-835e-c8af860710a7', 51, 'SWK TANDES', 'JL. BALONGSARI DALAM I', 16, 1, '2026-07-01 08:55:14'),
+('0b7f73aa-bb49-47f9-82bd-2d3607b45641', 50, 'SWK TAMAN PRESTASI', 'JL. KETABANG KALI NO.37', 35, 1, '2026-07-01 08:55:14'),
+('0d79867d-8d8e-415e-8147-a86abbd616ca', 49, 'SWK TAMAN BUNGKUL', 'TAMAN BUNGKUL', 51, 1, '2026-07-01 08:55:14'),
+('12e33321-4c1c-4f55-9b86-5620ea833e61', 48, 'SWK STUDIO', 'JL. JARAK NO 20', 12, 1, '2026-07-01 08:55:14'),
+('13b6af7f-5e52-4544-b648-db0998a0e4fa', 47, 'SWK SIOLA', 'JL TUNJUNGAN', 12, 1, '2026-07-01 08:55:14'),
+('14b8fc6a-5f8d-4efa-9125-6e074aea9afa', 46, 'SWK KREMBANGAN', 'JL. GRESIK NO. 54', 20, 1, '2026-07-01 08:55:14'),
+('16377e96-6a23-42c6-a5bf-33444cb475f0', 45, 'SWK KETABANG', 'JL. INSPEKSI KETABANG KALI NO.16', 38, 1, '2026-07-01 08:55:14'),
+('17c88952-1a47-462e-a543-840fc5199e27', 44, 'SWK KELAPA TAMBAKSARI', 'JL. TAMBAKSARI NO 11 A', 7, 1, '2026-07-01 08:55:14'),
+('1cfe19ed-e6ae-41c8-aa18-cf10f8fee7e7', 43, 'SWK KASUARI', 'JL.KASUARI NO.1', 20, 1, '2026-07-01 08:55:14'),
+('22b34dc0-c15a-4f91-86ef-f06d8ef26600', 42, 'SWK KARAH', 'JL. KARAH KEBON AGUNG NO. 1', 28, 1, '2026-07-01 08:55:14'),
+('23eadf72-9b85-49b1-b951-ea1836fdcadc', 41, 'SWK EMBONG SAWO', 'JL. EMBONG SAWO NO 20', 11, 1, '2026-07-01 08:55:14'),
+('2b4d6bd1-edaa-4194-b32b-39c50eacc47b', 53, 'SWK URIP SUMOHARJO', 'JL. URIP SUMOHARJO 46-48', 20, 1, '2026-07-01 08:55:14'),
+('2de9745c-a2c5-4b16-977d-2fc8ab722f6f', 40, 'SWK DHARMAWANGSA', 'JL. RAYA DHARMAWANGSA', 25, 1, '2026-07-01 08:55:14'),
+('348a1ce5-cb89-4f0b-87c5-b5629193018a', 39, 'SWK BRATANG BINANGUN', 'JL. BRATANG BINANGUN - JL.RAYA MANYAR', 52, 1, '2026-07-01 08:55:14'),
+('34d924e8-e8a1-4eb6-b679-33c27cfa87c0', 38, 'SWK BENTUL', 'JL. BENTUL I', 20, 1, '2026-07-01 08:55:14'),
+('35c7938a-7229-458e-ab43-ee5d175393c9', 37, 'SWK BALAS KLUMPRIK', 'JL. BALAS KLUMPRIK RT.03 RW.01', 2, 1, '2026-07-01 08:55:14'),
+('35da3184-b599-4eff-b931-96d77abdced0', 36, 'SRIKANA FOOD WALK', 'JL. SRIKANA', 25, 1, '2026-07-01 08:55:14'),
+('3931e48d-f076-4126-a359-5e3874140efe', 35, 'SWK WONOREJO', 'JL. KENDAL SARI', 18, 1, '2026-07-01 08:55:14'),
+('4bba05ab-8883-4f47-8173-031c4ef2f449', 34, 'SWK SEMEMI', 'JL SEMEMI KIDUL', 19, 1, '2026-07-01 08:55:14'),
+('54daa1e6-529e-446c-a8e0-ebded9e0e3b7', 33, 'SWK RUNGKUT KIDUL', 'JL RUNGKUT ASRI', 14, 1, '2026-07-01 08:55:14'),
+('56f83d8a-6c5a-45b8-b3e3-87be24ca5468', 32, 'SWK PUTRO AGUNG', 'JL. ALUN-ALUN RANGKAH', 35, 1, '2026-07-01 08:55:14'),
+('59ffc322-2189-432c-996a-7e0d35d8d786', 31, 'SWK LIDAH KULON', 'RAYA LIDAH KULON RT 1 RW 1', 15, 1, '2026-07-01 08:55:14'),
+('5cfa345f-7397-43c2-9985-19554859aaf0', 30, 'SWK KARANG ASEM', 'JL. RAYA KARANG ASEM NO. 58-60', 21, 1, '2026-07-01 08:55:14'),
+('6223244b-0fc5-485d-989d-96de9dd708d2', 29, 'SWK KANDANGAN', 'JL. TENGGER RAYA', 17, 1, '2026-07-01 08:55:14'),
+('6654a5d7-de8a-4cb8-ab5b-b39c33e1dc1b', 28, 'SWK INDRAPURA', 'JL. INDRAPURA NO.1', 24, 1, '2026-07-01 08:55:14'),
+('67d95c2a-75a5-40ff-a3fe-47224e62e386', 27, 'SWK SIWALANKERTO', 'JL. SIWALANKERTO NO. 132', 15, 1, '2026-07-01 08:55:14'),
+('6bdad473-586a-49fb-a621-f2944c6cd1e5', 26, 'SWK PEGIRIAN', 'JL.PEGIRIAN 240 - 244', 129, 1, '2026-07-01 08:55:14'),
+('73ec872a-5efc-419a-b5b5-89a96ed39091', 25, 'SWK MULYOREJO', 'JL. MULYOREJO NO.184', 37, 1, '2026-07-01 08:55:14'),
+('77f0732d-46e6-47e9-84c6-1d12957af02a', 24, 'SWK KENDUNG', 'JL. RAYA KENDUNG', 9, 1, '2026-07-01 08:55:14'),
+('8277f1b3-cf0e-4603-8c76-d58dd6107cb5', 23, 'SWK KEMBANG KUNING', 'JL. KEMBANG KUNING KULON GG I', 15, 1, '2026-07-01 08:55:14'),
+('8a19d973-8284-4dae-820d-5aed1ff6a05b', 54, 'XXX', 'alamat', 2, 0, '2026-07-01 11:47:13'),
+('8d73805d-edc2-43d3-bf19-c69c2761608c', 22, 'SWK IKAN DUYUNG', 'JL.IKAN DUYUNG NO.18B', 17, 1, '2026-07-01 08:55:14'),
+('8dc6d573-5b13-4988-986d-d4f0db6d0fa6', 21, 'SWK SUKOMANUNGGAL', 'JL. SUKOMANUNGGAL NO 118', 9, 1, '2026-07-01 08:55:14'),
+('9560c948-dbca-47fa-b3eb-8586d6f2f009', 20, 'SWK SEMOLOWARU', 'JL. SUKOSEMOLO NO.181', 28, 1, '2026-07-01 08:55:14'),
+('95d495af-b0f7-44e4-aa79-3606b38cd4eb', 19, 'SWK LIDAH WETAN', 'JL. LIDAH WETAN RT 2 RW 2', 18, 1, '2026-07-01 08:55:14'),
+('9885cd19-f244-476b-995d-7175b1a893ab', 18, 'SWK RMI', 'JL. NGAGEL JAYA SELATAN', 60, 1, '2026-07-01 08:55:14'),
+('a64892c5-970b-413b-a492-234dc31cb8d3', 17, 'SWK KLAMPIS NGASEM', 'DR. IR. SOEKARNO 103', 19, 1, '2026-07-01 08:55:14'),
+('a96bf285-1495-48a9-93e5-9843cb434057', 16, 'SWK TANAH MERAH', 'JL. TANAH MERAH GG .5', 15, 1, '2026-07-01 08:55:14'),
+('af19105e-3a47-4aeb-91ea-155dbd68a060', 15, 'SWK PENJARINGAN SARI', 'JL. RAYA PANDUGO', 33, 1, '2026-07-01 08:55:14'),
+('afbca506-0a6b-4690-94e4-fd0d2783d766', 14, 'SWK MANUKAN LOR', 'JL. MANUKAN LOR IV', 16, 1, '2026-07-01 08:55:14'),
+('b4fd4827-3c7b-434e-8594-74740f656b62', 13, 'SWK DUKUH MENANGGAL', 'JL. DUKUH MENANGGAL NO.1A', 28, 1, '2026-07-01 08:55:14'),
+('ba46bed2-cbb6-41fa-9b34-4d9c1e720387', 12, 'SWK DHARMAHUSADA', 'JL. PROF. DR. MOESTOPO NO. 130', 39, 1, '2026-07-01 08:55:14'),
+('c275c120-243b-4e2e-a816-2c3db5247ddf', 11, 'SWK JAJAR TUNGGAL', 'JL. MENGANTI KRAMAT NO 22', 18, 1, '2026-07-01 08:55:14'),
+('d4aa9241-eaad-4799-8da8-e3704b543827', 10, 'SWK DELES MERR', 'JL. ARIEF RAHMAN HAKIM NO.14', 36, 1, '2026-07-01 08:55:14'),
+('e29e3066-313a-44cb-9b60-3927c84959d9', 9, 'SWK BABAT JERAWAT', 'JL. RAYA BABAT JERAWAT', 28, 1, '2026-07-01 08:55:14'),
+('ea849a4b-5009-4900-a115-bf412cd037bc', 8, 'SWK GUNUNG ANYAR', 'JL. GUNUNG ANYAR SAWAH', 20, 1, '2026-07-01 08:55:14'),
+('ec0d209b-3d5a-466c-946a-7c0ad1e64f40', 7, 'SWK CONVENTION HALL', 'JL. ARIEF RAHMAN HAKIM NO.131-133', 39, 1, '2026-07-01 08:55:14'),
+('ef88a9ab-3178-4fba-b2da-b959a746b7bf', 6, 'SWK WIYUNG', 'JL. RAYA MENGANTI WIYUNG NO.1', 22, 1, '2026-07-01 08:55:14'),
+('ef94d996-31b7-4dab-b42c-0d001d44e525', 5, 'SWK GAYUNGAN', 'JL. MASJID AL-AKBARTIMUR NO.6', 28, 1, '2026-07-01 08:55:14'),
+('f1ef99ba-36d5-4e34-9bf1-b7ce609eb219', 4, 'SENTRA IKAN BULAK (SIB)', 'LAPAK HASIL OLAHAN LAUT', 40, 1, '2026-07-01 08:55:14'),
+('f485b575-c30d-4cd6-a049-2540a2a2e982', 3, 'SENTRA IKAN BULAK (SIB)', 'JL. SUKOLILO 7 NO.24', 43, 1, '2026-07-01 08:55:14'),
+('f5eab644-0fb9-4a7e-bda6-128d73d1ee1b', 2, 'SWK JAMBANGAN', 'JL. JAMBANGAN KEBON AGUNG NO.71 A', 17, 1, '2026-07-01 08:55:14'),
+('f6265a8f-0162-4184-9b63-dd8f90c54459', 1, 'SWK PONDOK MARITIM', 'JL. RAYA KARANG KLUMPRIK', 31, 1, '2026-07-01 08:55:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `m_target`
+--
+
+DROP TABLE IF EXISTS `m_target`;
+CREATE TABLE IF NOT EXISTS `m_target` (
+  `idtarget` char(36) NOT NULL,
+  `tahun` smallint(6) NOT NULL,
+  `idindikator` varchar(100) NOT NULL,
+  `subindikator` varchar(100) DEFAULT '',
+  `target` decimal(10,0) DEFAULT '0',
+  `urut` int(11) NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_by` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`idtarget`),
+  UNIQUE KEY `uniq_target` (`tahun`,`idindikator`,`subindikator`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `m_target`
+--
+
+INSERT INTO `m_target` (`idtarget`, `tahun`, `idindikator`, `subindikator`, `target`, `urut`, `created_at`, `created_by`) VALUES
+('0d498736-ce6b-4d62-9573-8802e904df6a', 2026, '64b8d754-e4c9-4d06-9178-fd912ae909b1', 'cukup', '0', 0, '2026-07-09 16:50:46', NULL),
+('0d6bd17d-b62f-4afd-a2e2-29e39fe450bd', 2026, '64b8d754-e4c9-4d06-9178-fd912ae909b1', '', '0', 0, '2026-07-09 16:48:25', NULL),
+('19ca4df6-5796-420d-a94d-97a2a54e7edb', 2026, 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', 'cukup', '0', 0, '2026-07-09 16:46:45', NULL),
+('27e58364-473b-42c4-89f0-1a80f3e865e4', 2026, '64b8d754-e4c9-4d06-9178-fd912ae909b1', 'baik', '0', 0, '2026-07-09 16:50:27', NULL),
+('2b286779-46fa-45bb-86c5-24ae61dcd62', 2026, '54dafcd5-b44a-480f-944a-75cbdf1920fe', 'cukup', '0', 0, '2026-07-09 16:54:41', NULL),
+('5297d024-f3dd-417f-bea5-aafdb81538f5', 2026, '95e0569a-ca6e-4a1d-8220-252bf644724f', 'buruk', '0', 0, '2026-07-09 16:52:53', NULL),
+('6354f0af-0afb-427c-a2d0-09ea9da454ae', 2026, '95e0569a-ca6e-4a1d-8220-252bf644724f', 'cukup', '0', 0, '2026-07-09 16:52:24', NULL),
+('71c78129-2890-4c4c-a702-2de066699328', 2026, 'c8615d2f-e605-4f99-9d5f-8126f33455ea', 'sudah', '0', 0, '2026-07-11 19:56:30', NULL),
+('767e06af-b3d6-4f41-9c54-0a1d65993611', 2026, '82f681f4-59c6-4312-bb89-69a6ea4533b2', 'tidak', '0', 0, '2026-07-11 20:00:40', NULL),
+('7b867ebc-e497-407c-a1ac-c462bf98aeb0', 2026, '923a7563-2465-4baf-9225-87431afd010b', 'ada', '0', 0, '2026-07-11 20:02:55', NULL),
+('8d57afc9-d91f-42e9-bb33-33cbc62345aa', 2026, 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', 'buruk', '0', 0, '2026-07-09 16:56:34', NULL),
+('92e85654-58dd-404a-8073-509b64682afc', 2026, 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', 'baik', '0', 0, '2026-07-09 16:56:21', NULL),
+('9581080b-7963-4b0d-ac5e-3291d0dc0cb8', 2026, 'c8615d2f-e605-4f99-9d5f-8126f33455ea', 'belum', '0', 0, '2026-07-11 19:55:51', NULL),
+('9734ef1f-533c-4229-ba0a-289033cc9500', 2026, '64b8d754-e4c9-4d06-9178-fd912ae909b1', 'buruk', '0', 0, '2026-07-09 16:50:57', NULL),
+('993f2ff5-7183-46b2-a987-831d5ad63a21', 2026, '923a7563-2465-4baf-9225-87431afd010b', 'tidak', '0', 0, '2026-07-11 20:01:47', NULL),
+('9b4db223-1ca8-43ba-b9e2-43bda531c2c9', 2026, 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', 'cukup', '0', 0, '2026-07-09 16:56:07', NULL),
+('cd79791f-e6a5-498d-a9d3-c87e0b4feb8b', 2026, 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', 'buruk', '0', 0, '2026-07-09 16:46:59', NULL),
+('de6dcf17-9c9f-4cbe-b4f7-bdc0ceee6250', 2026, 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', 'baik', '0', 0, '2026-07-09 16:46:09', NULL),
+('e1f12d1a-fc4d-4791-81e5-1a149803611d', 2026, '54dafcd5-b44a-480f-944a-75cbdf1920fe', 'buruk', '0', 0, '2026-07-09 16:54:54', NULL),
+('e5d38909-ce21-467d-8a7d-84091c318d44', 2026, '82f681f4-59c6-4312-bb89-69a6ea4533b2', 'ada', '0', 0, '2026-07-11 20:00:59', NULL),
+('e6837c46-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe494d-7522-11f1-92f4-0040b87d9637', '', '3', 0, '2026-07-01 22:17:04', NULL),
+('e68381fc-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5494-7522-11f1-92f4-0040b87d9637', '', '1', 0, '2026-07-01 22:17:04', NULL),
+('e68382a8-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'nib', '3', 1, '2026-07-01 22:17:04', NULL),
+('e68382ed-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'sk', '3', 2, '2026-07-01 22:17:04', NULL),
+('e683832b-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'satu_data', '3', 3, '2026-07-01 22:17:04', NULL),
+('e6838367-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe570b-7522-11f1-92f4-0040b87d9637', '', NULL, 0, '2026-07-01 22:17:04', NULL),
+('e68383a2-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5891-7522-11f1-92f4-0040b87d9637', 'kebersihan_ruang_makan', '100', 1, '2026-07-01 22:17:04', NULL),
+('e68383e2-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5891-7522-11f1-92f4-0040b87d9637', 'kebersihan_tenan', '100', 2, '2026-07-01 22:17:04', NULL),
+('e6838423-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5891-7522-11f1-92f4-0040b87d9637', 'kebersihan_toilet', '100', 3, '2026-07-01 22:17:04', NULL),
+('e6838465-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5891-7522-11f1-92f4-0040b87d9637', 'kebersihan_area_parkir', '100', 4, '2026-07-01 22:17:04', NULL),
+('e68384a3-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5891-7522-11f1-92f4-0040b87d9637', 'kebersihan_produk_makanan', '100', 5, '2026-07-01 22:17:04', NULL),
+('e68384e3-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe59a4-7522-11f1-92f4-0040b87d9637', '', NULL, 0, '2026-07-01 22:17:04', NULL),
+('e6838516-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5aa0-7522-11f1-92f4-0040b87d9637', '', NULL, 0, '2026-07-01 22:17:04', NULL),
+('e6838561-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', 'baik', '0', 0, '2026-07-01 22:17:04', NULL),
+('e68385a2-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', 'cukup', '0', 0, '2026-07-01 22:17:04', NULL),
+('e68385e4-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', 'buruk', '0', 0, '2026-07-01 22:17:04', NULL),
+('e6838625-755f-11f1-92f4-0040b87d9637', 2026, 'f9fe5cb9-7522-11f1-92f4-0040b87d9637', '', NULL, 0, '2026-07-01 22:17:04', NULL),
+('ea501e06-f70c-4d94-ab41-6b922411f2ef', 2026, '54dafcd5-b44a-480f-944a-75cbdf1920fe', 'baik', '0', 0, '2026-07-09 16:54:24', NULL),
+('ebd1dc85-cb28-4ff8-b4bd-99fb0b00a926', 2026, '95e0569a-ca6e-4a1d-8220-252bf644724f', 'baik', '0', 0, '2026-07-09 16:52:09', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `m_users`
+--
+
+DROP TABLE IF EXISTS `m_users`;
+CREATE TABLE IF NOT EXISTS `m_users` (
+  `nik` varchar(30) NOT NULL,
+  `pass` varchar(200) DEFAULT NULL,
+  `nama_lengkap` varchar(200) DEFAULT NULL,
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `role` varchar(20) DEFAULT NULL,
+  `jabatan` varchar(255) DEFAULT NULL,
+  `pangkat` varchar(255) DEFAULT NULL,
+  `nip_penyelia` varchar(30) DEFAULT NULL,
+  `nip_petugas` varchar(30) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `no_tlp` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`nik`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `m_users`
+--
+
+INSERT INTO `m_users` (`nik`, `pass`, `nama_lengkap`, `aktif`, `role`, `jabatan`, `pangkat`, `nip_penyelia`, `nip_petugas`, `created_at`, `no_tlp`) VALUES
+('196901261994032003', '$2y$10$DPxVhOcx/NuizyCcRBuT/OkPr5KuUfrT1BhzbXYxNBaPT6ipdjMcW', 'MIA SANTI DEWI SH, M.Si', 1, 'pimpinan', NULL, NULL, NULL, NULL, '2026-07-02 13:53:15', ''),
+('197507152009011001', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'MISBAHUL MUNIR, SE', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081393308877'),
+('197510042025211027', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'NUR SUCAHYO, ST', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '087852780006'),
+('198112042025211044', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'A.SHOFWAN HANAFI, SE', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081236067566'),
+('198212252025211060', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'RAHMAT BUDI TULUNG P.D, SH', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081553455182'),
+('198305112025211091', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'PURBO LAKSONO,SH', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '082141613345'),
+('198308132025211061', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'MUJIADI, SH', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081252583099'),
+('198308222025211035', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'ROKI KUSUMA, SE', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '082140012792'),
+('198606212025211120', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'ANDY SATRIA NIZAM, A.Md', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085646164393'),
+('198802242025211061', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'FEBRY KRISTIAN', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085334209093'),
+('198806062025211153', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'FARID ARTHA, SE', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081235699488'),
+('199106172025211084', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'YUNANTO AGUNG TRIATMOJO, A.MD', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085707022253'),
+('199108032025212098', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'RIZKA MARDAYANI, ST', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081313132401'),
+('199108212025212056', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'DYOTA SWASTI KARTIKA, S.KOM', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '082312555445'),
+('199204072025212115', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'FILZAH APRITASARI', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 08:57:28', NULL),
+('199306132025211057', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'JADIKA INDRIADI, S.S', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081703124112'),
+('199402242025211078', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'YUMA DARULLOH SAIFUL IMAN ROMADHON, S.H.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081358473752'),
+('199408062025212069', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'ANDALIKA ILMIANTI, A.Md.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085731509985'),
+('199506132025212085', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'FIDHYAJENG TALITHA SUGIARTO, S.SOS', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081233703839'),
+('199512062025211064', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'MOCH. ROHMAN, SE', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '087758121009'),
+('199605122025212075', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'AINI AULIA, S.KOM', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '0881026561948'),
+('199606062025212110', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'RULLY VANYZA AVANY, S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '082112646911'),
+('199610172025212060', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'DYAH TANTRI, ST', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081234981533'),
+('199612082025212088', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'RIZKI ADEVIANA, S.Pd.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '089517561534'),
+('199708192025212066', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'NOVITA DWI AGUSTINA, SM', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085335009591'),
+('admin', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'ADMINISTRATOR', 1, 'administrator', NULL, NULL, NULL, NULL, '2026-07-17 13:11:24', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pendamping_swk`
+--
+
+DROP TABLE IF EXISTS `pendamping_swk`;
+CREATE TABLE IF NOT EXISTS `pendamping_swk` (
+  `nip` char(30) NOT NULL,
+  `idswk` char(50) NOT NULL,
+  PRIMARY KEY (`nip`,`idswk`),
+  KEY `idswk` (`idswk`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `pendamping_swk`
+--
+
+INSERT INTO `pendamping_swk` (`nip`, `idswk`) VALUES
+('199506132025212085', '014aa9e8-b45a-4328-9d27-47c332b76f5b'),
+('199708192025212066', '06e47c44-0980-4bae-835e-c8af860710a7'),
+('199108032025212098', '0b7f73aa-bb49-47f9-82bd-2d3607b45641'),
+('198308222025211035', '0d79867d-8d8e-415e-8147-a86abbd616ca'),
+('199408062025212069', '13b6af7f-5e52-4544-b648-db0998a0e4fa'),
+('198802242025211061', '14b8fc6a-5f8d-4efa-9125-6e074aea9afa'),
+('199108032025212098', '16377e96-6a23-42c6-a5bf-33444cb475f0'),
+('199605122025212075', '17c88952-1a47-462e-a543-840fc5199e27'),
+('197507152009011001', '1cfe19ed-e6ae-41c8-aa18-cf10f8fee7e7'),
+('198305112025211091', '22b34dc0-c15a-4f91-86ef-f06d8ef26600'),
+('199408062025212069', '23eadf72-9b85-49b1-b951-ea1836fdcadc'),
+('198112042025211044', '2b4d6bd1-edaa-4194-b32b-39c50eacc47b'),
+('197510042025211027', '2de9745c-a2c5-4b16-977d-2fc8ab722f6f'),
+('198806062025211153', '348a1ce5-cb89-4f0b-87c5-b5629193018a'),
+('198308132025211061', '34d924e8-e8a1-4eb6-b679-33c27cfa87c0'),
+('199612082025212088', '35c7938a-7229-458e-ab43-ee5d175393c9'),
+('197510042025211027', '35da3184-b599-4eff-b931-96d77abdced0'),
+('199402242025211078', '3931e48d-f076-4126-a359-5e3874140efe'),
+('199610172025212060', '4bba05ab-8883-4f47-8173-031c4ef2f449'),
+('199306132025211057', '54daa1e6-529e-446c-a8e0-ebded9e0e3b7'),
+('199605122025212075', '56f83d8a-6c5a-45b8-b3e3-87be24ca5468'),
+('198606212025211120', '59ffc322-2189-432c-996a-7e0d35d8d786'),
+('199605122025212075', '5cfa345f-7397-43c2-9985-19554859aaf0'),
+('199204072025212115', '6223244b-0fc5-485d-989d-96de9dd708d2'),
+('199708192025212066', '6223244b-0fc5-485d-989d-96de9dd708d2'),
+('198212252025211060', '6654a5d7-de8a-4cb8-ab5b-b39c33e1dc1b'),
+('198308222025211035', '67d95c2a-75a5-40ff-a3fe-47224e62e386'),
+('197507152009011001', '6bdad473-586a-49fb-a621-f2944c6cd1e5'),
+('199306132025211057', '73ec872a-5efc-419a-b5b5-89a96ed39091'),
+('199610172025212060', '77f0732d-46e6-47e9-84c6-1d12957af02a'),
+('198212252025211060', '8d73805d-edc2-43d3-bf19-c69c2761608c'),
+('199708192025212066', '8dc6d573-5b13-4988-986d-d4f0db6d0fa6'),
+('199606062025212110', '9560c948-dbca-47fa-b3eb-8586d6f2f009'),
+('198606212025211120', '95d495af-b0f7-44e4-aa79-3606b38cd4eb'),
+('198806062025211153', '9885cd19-f244-476b-995d-7175b1a893ab'),
+('199606062025212110', 'a64892c5-970b-413b-a492-234dc31cb8d3'),
+('198802242025211061', 'a96bf285-1495-48a9-93e5-9843cb434057'),
+('199402242025211078', 'af19105e-3a47-4aeb-91ea-155dbd68a060'),
+('199506132025212085', 'afbca506-0a6b-4690-94e4-fd0d2783d766'),
+('198308132025211061', 'b4fd4827-3c7b-434e-8594-74740f656b62'),
+('199106172025211084', 'ba46bed2-cbb6-41fa-9b34-4d9c1e720387'),
+('199108212025212056', 'c275c120-243b-4e2e-a816-2c3db5247ddf'),
+('199402242025211078', 'd4aa9241-eaad-4799-8da8-e3704b543827'),
+('199610172025212060', 'e29e3066-313a-44cb-9b60-3927c84959d9'),
+('199306132025211057', 'ea849a4b-5009-4900-a115-bf412cd037bc'),
+('199106172025211084', 'ec0d209b-3d5a-466c-946a-7c0ad1e64f40'),
+('199108212025212056', 'ef88a9ab-3178-4fba-b2da-b959a746b7bf'),
+('199612082025212088', 'ef94d996-31b7-4dab-b42c-0d001d44e525'),
+('199512062025211064', 'f1ef99ba-36d5-4e34-9bf1-b7ce609eb219'),
+('199512062025211064', 'f485b575-c30d-4cd6-a049-2540a2a2e982'),
+('198305112025211091', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b'),
+('199204072025212115', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b'),
+('199204072025212115', 'f6265a8f-0162-4184-9b63-dd8f90c54459'),
+('199612082025212088', 'f6265a8f-0162-4184-9b63-dd8f90c54459');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_kunjungan_harian`
+--
+
+DROP TABLE IF EXISTS `t_kunjungan_harian`;
+CREATE TABLE IF NOT EXISTS `t_kunjungan_harian` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idswk` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `jumlah` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
+  `created_by` varchar(20) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_swk_tanggal` (`idswk`,`tanggal`),
+  KEY `idx_tanggal` (`tanggal`),
+  KEY `idx_swk` (`idswk`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `t_kunjungan_harian`
+--
+
+INSERT INTO `t_kunjungan_harian` (`id`, `idswk`, `tanggal`, `jumlah`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 0, '2026-07-01', 200, '199204072025212115', '2026-07-20 14:25:09', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_nilai_swk`
+--
+
+DROP TABLE IF EXISTS `t_nilai_swk`;
+CREATE TABLE IF NOT EXISTS `t_nilai_swk` (
+  `idnilai` char(36) NOT NULL,
+  `idperform` char(36) NOT NULL,
+  `nilai_total` decimal(8,2) DEFAULT NULL,
+  `kategori` enum('Sangat Baik','Baik','Cukup','Kurang') DEFAULT NULL,
+  PRIMARY KEY (`idnilai`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_omset_harian`
+--
+
+DROP TABLE IF EXISTS `t_omset_harian`;
+CREATE TABLE IF NOT EXISTS `t_omset_harian` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idswk` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `omset` decimal(18,2) NOT NULL DEFAULT '0.00',
+  `created_by` varchar(30) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_swk_tanggal` (`idswk`,`tanggal`),
+  KEY `idx_tanggal` (`tanggal`),
+  KEY `idx_swk` (`idswk`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `t_omset_harian`
+--
+
+INSERT INTO `t_omset_harian` (`id`, `idswk`, `tanggal`, `omset`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 0, '2026-07-01', '2000000.00', '199204072025212115', '2026-07-20 14:24:52', '2026-07-20 14:28:38'),
+(2, 0, '2026-07-02', '1500000.00', '199204072025212115', '2026-07-20 14:28:45', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_perform`
+--
+
+DROP TABLE IF EXISTS `t_perform`;
+CREATE TABLE IF NOT EXISTS `t_perform` (
+  `idperform` varchar(36) NOT NULL,
+  `idswk` varchar(36) NOT NULL,
+  `bulan` tinyint(4) NOT NULL,
+  `tahun` smallint(6) NOT NULL,
+  `created_by` varchar(36) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idperform`),
+  UNIQUE KEY `uniq_perform` (`idswk`,`bulan`,`tahun`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `t_perform`
+--
+
+INSERT INTO `t_perform` (`idperform`, `idswk`, `bulan`, `tahun`, `created_by`, `created_at`) VALUES
+('5803692a-2276-48b7-9bde-4a0fef5f854e', '1cfe19ed-e6ae-41c8-aa18-cf10f8fee7e7', 7, 2026, '197507152009011001', '2026-07-16 15:38:34'),
+('9868f807-bbb0-4efa-b1e2-0454159646e1', 'f6265a8f-0162-4184-9b63-dd8f90c54459', 7, 2026, '199204072025212115', '2026-07-11 20:13:25'),
+('d7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '6223244b-0fc5-485d-989d-96de9dd708d2', 7, 2026, '199204072025212115', '2026-07-14 11:08:29'),
+('f7f2e040-8952-4f98-8ee1-679c232772b5', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b', 7, 2026, '199204072025212115', '2026-07-14 10:17:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_perform_detail`
+--
+
+DROP TABLE IF EXISTS `t_perform_detail`;
+CREATE TABLE IF NOT EXISTS `t_perform_detail` (
+  `iddetail` varchar(36) NOT NULL,
+  `idperform` varchar(36) NOT NULL,
+  `idindikator` varchar(36) NOT NULL,
+  `subindikator` varchar(100) DEFAULT NULL,
+  `target` decimal(12,0) DEFAULT NULL,
+  `realisasi` decimal(12,0) DEFAULT NULL,
+  `nilai_text` text,
+  `nilai_radio` varchar(30) DEFAULT NULL,
+  `data_dukung` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`iddetail`),
+  UNIQUE KEY `uniq_detail` (`idperform`,`idindikator`,`subindikator`),
+  KEY `idperform` (`idperform`),
+  KEY `idindikator` (`idindikator`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `t_perform_detail`
+--
+
+INSERT INTO `t_perform_detail` (`iddetail`, `idperform`, `idindikator`, `subindikator`, `target`, `realisasi`, `nilai_text`, `nilai_radio`, `data_dukung`, `created_at`) VALUES
+('02bffdf6-77e7-43c0-9c73-1f60f509f422', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5494-7522-11f1-92f4-0040b87d9637', NULL, '57515460', '60000000', NULL, NULL, NULL, '2026-07-14 11:08:36'),
+('0504915e-efa3-4974-b5f9-f26de5350faf', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 10:18:05'),
+('07f56203-9a40-4c99-90f7-0df89729d885', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'sk', '17', '17', NULL, NULL, NULL, '2026-07-14 10:17:57'),
+('08625c03-a8a1-486a-8182-e541944297e8', 'f7f2e040-8952-4f98-8ee1-679c232772b5', '923a7563-2465-4baf-9225-87431afd010b', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 10:18:14'),
+('09dd3bd6-a52b-435f-8153-029c7655a58e', '9868f807-bbb0-4efa-b1e2-0454159646e1', '923a7563-2465-4baf-9225-87431afd010b', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 16:00:13'),
+('113415d2-4d4e-4806-852d-c0d7eae5d426', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'c8615d2f-e605-4f99-9d5f-8126f33455ea', NULL, NULL, NULL, NULL, 'sudah', NULL, '2026-07-11 22:06:15'),
+('12246119-54cc-4f6b-a703-4f4c2b3a37d3', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'nib', '31', '31', NULL, NULL, NULL, '2026-07-11 21:59:35'),
+('21276858-5d10-4339-bb8d-ac3243ea2389', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '54dafcd5-b44a-480f-944a-75cbdf1920fe', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 14:56:23'),
+('2a91f74a-fbe4-4061-bff9-07b3c03fdbe1', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe59a4-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, '200', NULL, NULL, '2026-07-14 11:09:07'),
+('2fde0e0b-cf65-46f8-9532-9ebf17d96ec4', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5aa0-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'ide praktis kepada pedagang', NULL, NULL, '2026-07-14 10:18:40'),
+('34aab963-d91f-4eda-ba40-73aaa8739eff', '5803692a-2276-48b7-9bde-4a0fef5f854e', 'f9fe494d-7522-11f1-92f4-0040b87d9637', NULL, '20', '20', NULL, NULL, NULL, '2026-07-16 15:38:34'),
+('387d56b9-8732-4fe6-be81-90d8761fb169', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5cb9-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'rapat evaluasi', NULL, NULL, '2026-07-14 11:09:17'),
+('3f20c8e6-be11-4873-90a2-92c5742396c7', '9868f807-bbb0-4efa-b1e2-0454159646e1', '54dafcd5-b44a-480f-944a-75cbdf1920fe', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:06:10'),
+('3fbfc59a-7d02-4042-81b0-3974176be7c4', '5803692a-2276-48b7-9bde-4a0fef5f854e', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'sk', '20', '20', NULL, NULL, NULL, '2026-07-16 15:38:57'),
+('433f8a08-d760-48eb-8685-1843893cf011', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'satu_data', '31', '31', NULL, NULL, NULL, '2026-07-11 21:59:35'),
+('43c4ef6c-4e41-4e71-9178-e09e6503a722', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5494-7522-11f1-92f4-0040b87d9637', NULL, '31764500', '33000000', NULL, NULL, NULL, '2026-07-11 21:26:31'),
+('479fc1ed-f723-46a1-ba79-dfe5f1024bb6', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 15:59:22'),
+('4b153b4a-733a-48f3-a069-7f04f7b958d6', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'nib', '17', '17', NULL, NULL, NULL, '2026-07-14 10:17:57'),
+('5570c75f-bfe7-487e-9c51-3d89cb7120e6', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 11:09:00'),
+('5d5ef9f7-58d6-47b7-a3c1-44c45b6154e5', 'f7f2e040-8952-4f98-8ee1-679c232772b5', '82f681f4-59c6-4312-bb89-69a6ea4533b2', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 10:18:12'),
+('5f0faba0-ff92-4161-8924-d0f3c6026998', '5803692a-2276-48b7-9bde-4a0fef5f854e', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'nib', '20', '20', NULL, NULL, NULL, '2026-07-16 15:38:57'),
+('616bde44-d98d-427c-9e00-df4973d5ca6b', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '64b8d754-e4c9-4d06-9178-fd912ae909b1', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 11:09:00'),
+('619360e8-1987-423d-b97c-0a07e230c9d9', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe494d-7522-11f1-92f4-0040b87d9637', NULL, '17', '17', NULL, NULL, NULL, '2026-07-14 10:17:40'),
+('6270ddc9-ee3e-47e9-b5b6-e6f9a5ad811f', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, NULL, 'baik', 'WhatsApp_Image_2026-07-10_at_7_22_38_AM_20260723153334_54c797.jpeg', '2026-07-14 10:18:23'),
+('6857c91f-c9b7-484f-a8f6-2a2413afdb18', '9868f807-bbb0-4efa-b1e2-0454159646e1', '82f681f4-59c6-4312-bb89-69a6ea4533b2', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 14:56:49'),
+('6d576ee4-b769-4af8-b210-aff118adc8e7', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'c8615d2f-e605-4f99-9d5f-8126f33455ea', NULL, NULL, NULL, NULL, 'sudah', NULL, '2026-07-14 10:18:11'),
+('6fdcabfd-daa6-4ae6-afd6-064e75b42cbf', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5cb9-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'rapat evaluasi', NULL, NULL, '2026-07-14 10:18:30'),
+('724b1791-e820-42c3-a800-1f4d44d98702', '9868f807-bbb0-4efa-b1e2-0454159646e1', '95e0569a-ca6e-4a1d-8220-252bf644724f', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:07:37'),
+('8398b514-ac7c-4141-9082-bf0394942b96', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'fef41c0b-f25a-4915-bfc7-e7af7f6db632', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:07:32'),
+('83feb694-a44a-4e84-a96b-8bf8e18b3605', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5aa0-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'ide praktis', NULL, NULL, '2026-07-14 11:09:22'),
+('86e4e416-d2f8-4f55-9dc8-61587e77c748', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:06:12'),
+('891b8f58-05e4-4aef-8626-16b7a492f44f', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '95e0569a-ca6e-4a1d-8220-252bf644724f', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 11:09:01'),
+('8be280fb-506f-4a14-ae53-e37d2ec2e1d8', '5803692a-2276-48b7-9bde-4a0fef5f854e', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'satu_data', '20', '20', NULL, NULL, NULL, '2026-07-16 15:38:57'),
+('9017be92-33e8-49f1-ad5a-6e8383e0fa6a', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe494d-7522-11f1-92f4-0040b87d9637', NULL, '17', '17', NULL, NULL, NULL, '2026-07-14 11:08:29'),
+('95d99133-49f6-4b66-bd8d-a522a64b518b', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'c8c93695-07d2-4bd3-b1fe-3fd1198dc012', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 14:09:03'),
+('9bed0782-6c2f-4cb8-b582-1ad1b33af455', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'satu_data', '17', '17', NULL, NULL, NULL, '2026-07-14 10:17:57'),
+('a0038d0a-7c55-4678-8ae5-bacd76cb85cb', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe494d-7522-11f1-92f4-0040b87d9637', NULL, '31', '31', NULL, NULL, NULL, '2026-07-11 21:54:19'),
+('a5cdee6b-e393-42b8-9499-c351a76e22ca', 'f7f2e040-8952-4f98-8ee1-679c232772b5', '64b8d754-e4c9-4d06-9178-fd912ae909b1', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 15:58:44'),
+('ab2e4454-ba57-479a-a770-8baacbafd8e1', 'f7f2e040-8952-4f98-8ee1-679c232772b5', '95e0569a-ca6e-4a1d-8220-252bf644724f', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 15:58:46'),
+('af3e9144-dafa-4d1d-9207-df50641390f9', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'satu_data', '17', '17', NULL, NULL, NULL, '2026-07-14 11:08:42'),
+('b148c0d5-48d9-43e0-9c31-e2ba248fd735', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe570b-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'google.com', NULL, NULL, '2026-07-14 16:02:06'),
+('b1de0aa2-16af-483f-91a6-098a347289ec', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'sk', '17', '17', NULL, NULL, NULL, '2026-07-14 11:08:42'),
+('b3d4db66-d01b-45ca-9337-5acf33aeb138', 'f7f2e040-8952-4f98-8ee1-679c232772b5', '54dafcd5-b44a-480f-944a-75cbdf1920fe', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 10:18:08'),
+('b6a4e287-ef76-4f07-bae2-36e296d8409b', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'nib', '17', '17', NULL, NULL, NULL, '2026-07-14 11:08:42'),
+('b8e50668-1fac-4258-a61e-08f30d6f024c', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe59a4-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, '200', NULL, NULL, '2026-07-14 10:18:20'),
+('bba8500b-55bb-4de4-9934-1d36a23452bf', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'c8615d2f-e605-4f99-9d5f-8126f33455ea', NULL, NULL, NULL, NULL, 'sudah', NULL, '2026-07-14 11:09:01'),
+('c19deaf8-4223-4454-b489-1d4d37d74113', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '923a7563-2465-4baf-9225-87431afd010b', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 11:09:04'),
+('c3ad3cab-fe76-420b-aeed-23a1af8b597e', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5cb9-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'rapat evaluasi\r\n', NULL, NULL, '2026-07-11 22:06:50'),
+('cd886b85-9b9e-447a-886c-22f0df359754', '5803692a-2276-48b7-9bde-4a0fef5f854e', 'f9fe5494-7522-11f1-92f4-0040b87d9637', NULL, '343925200', '350000000', NULL, NULL, NULL, '2026-07-16 15:38:50'),
+('cd9e7a14-d12f-4ee7-9d3e-a7ff87e0191e', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5aa0-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, 'ide praktis', NULL, NULL, '2026-07-11 22:06:58'),
+('d05af8b9-5b25-470e-bddf-6593f343a581', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', '82f681f4-59c6-4312-bb89-69a6ea4533b2', NULL, NULL, NULL, NULL, 'ada', NULL, '2026-07-14 11:09:03'),
+('d672f9ad-6fae-4871-b5b0-cf1378a5cd06', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe59a4-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, '200', NULL, NULL, '2026-07-11 22:06:34'),
+('dceb4884-2304-4349-b97f-caa28fb9077a', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:06:40'),
+('e4ea4166-9207-4863-8782-da10d3763772', 'd7bbe1c8-b0ca-4c4e-991a-0071f0ada9af', 'f9fe5b9e-7522-11f1-92f4-0040b87d9637', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-14 11:09:10'),
+('f98f9988-94c9-4d0b-a7b6-58638f164414', '9868f807-bbb0-4efa-b1e2-0454159646e1', 'f9fe5605-7522-11f1-92f4-0040b87d9637', 'sk', '31', '31', NULL, NULL, NULL, '2026-07-11 21:59:35'),
+('fc02dd48-216d-47f6-9b9c-5428f1461d9b', '9868f807-bbb0-4efa-b1e2-0454159646e1', '64b8d754-e4c9-4d06-9178-fd912ae909b1', NULL, NULL, NULL, NULL, 'baik', NULL, '2026-07-11 22:07:35'),
+('fcde7395-277d-427d-b8d2-c29c53cb55e0', 'f7f2e040-8952-4f98-8ee1-679c232772b5', 'f9fe5494-7522-11f1-92f4-0040b87d9637', NULL, '41652400', '3500000', NULL, NULL, NULL, '2026-07-14 10:17:49');
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `m_omset`
+--
+ALTER TABLE `m_omset`
+  ADD CONSTRAINT `fk_omset_swk` FOREIGN KEY (`idswk`) REFERENCES `m_swk` (`idswk`) ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

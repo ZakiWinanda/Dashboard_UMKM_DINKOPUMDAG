@@ -1,0 +1,9 @@
+# CodeIgniter ignore
+application/logs/log-*.php
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tmp
