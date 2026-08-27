@@ -217,4 +217,27 @@ class M_unit_usaha extends CI_Model
             ->row();
         return (int)($q->jumlah ?? 0);
     }
+
+    public function saveBatchOmset($batch)
+    {
+        if (empty($batch)) return 0;
+        $count = 0;
+        foreach ($batch as $data) {
+            $this->saveOmset($data);
+            $count++;
+        }
+        return $count;
+    }
+
+    public function saveBatchKunjungan($batch)
+    {
+        if (empty($batch)) return 0;
+        $count = 0;
+        foreach ($batch as $data) {
+            $this->saveKunjungan($data);
+            $count++;
+        }
+        return $count;
+    }
 }
+
