@@ -54,7 +54,18 @@ class Capaian_harian extends MY_Controller
     public function load_data()
     {
         $idswk   = trim((string)$this->input->post('idswk'));
-        $periode = trim($this->input->post('filter_bulan_tahun'));
+        $periode = trim((string)$this->input->post('filter_bulan_tahun'));
+
+        if (empty($idswk)) {
+            $monev_swk = $this->session->userdata('monev_swk');
+            $nip       = $monev_swk['nip'] ?? $this->session->userdata('nip');
+            $role      = $monev_swk['role'] ?? $this->session->userdata('role');
+            $list_swk  = $this->M_swk->get_swk_by_user($nip, $role);
+            if (!empty($list_swk)) {
+                $first = current($list_swk);
+                $idswk = is_array($first) ? ($first['idswk'] ?? $first['id'] ?? '') : ($first->idswk ?? $first->id ?? '');
+            }
+        }
 
         if (empty($periode)) {
             $periode = date('m-Y');
