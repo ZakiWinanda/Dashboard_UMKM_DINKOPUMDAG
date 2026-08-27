@@ -8,6 +8,10 @@
             loadData();
         });
 
+        $(document).on('change', '#pilih_swk, [name=pilih_swk]', function(){
+            loadData();
+        });
+
         // Auto Load data pertama kali jika SWK sudah terpilih
         if ($('#pilih_swk').val() || $('[name=pilih_swk]').val()) {
             loadData();

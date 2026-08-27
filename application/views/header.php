@@ -113,15 +113,8 @@
                             </a>
                         </li>
 
-                        <?php
-                        if($is_pimpinan || $is_admin) {
-                            print_r('<li class="nav-header">MENU PENDAMPING</li>');
-                        }
-                        else {
-                            print_r('<li class="nav-header">MENU</li>');
-                        }
-                        ?>
-
+                        <?php if (empty($is_pimpinan)): ?>
+                        <li class="nav-header">MENU PENDAMPING</li>
                         <li class="nav-item">
                             <a href="<?=base_url('input_harian');?>" class="nav-link <?php if($uri1=='input_harian') echo('active');?>">
                                 <i class="nav-icon fa fa-edit"></i>
@@ -146,32 +139,29 @@
                                 <p>LAPORAN</p>
                             </a>
                         </li>
+                        <?php endif; ?>
 
-                        <?php
-                        if($is_koordinator_pendamping || $is_pimpinan || $is_admin) {
-                            ?>
-                            <li class="nav-header">MENU KOORDINATOR</li>
-                            <li class="nav-item">
-                                <a href="<?=base_url('koordinator_pendamping/capaian_harian');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='capaian_harian') echo('active');?>">
-                                    <i class="nav-icon fa fa-edit"></i>
-                                    <p>ENTRI OMSET & KUNJUNGAN</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="<?=base_url('koordinator_pendamping/entri');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='entri') echo('active');?>">
-                                    <i class="nav-icon fa fa-edit"></i>
-                                    <p>CAPAIAN INDIKATOR</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="<?=base_url('koordinator_pendamping/laporan');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='laporan') echo('active');?>">
-                                    <i class="nav-icon fa fa-print"></i>
-                                    <p>LAPORAN</p>
-                                </a>
-                            </li>
-                            <?php
-                        }
-                        ?>
+                        <?php if (!empty($is_koordinator_pendamping) || !empty($is_pimpinan) || !empty($is_admin)): ?>
+                        <li class="nav-header">MENU KOORDINATOR</li>
+                        <li class="nav-item">
+                            <a href="<?=base_url('koordinator_pendamping/capaian_harian');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='capaian_harian') echo('active');?>">
+                                <i class="nav-icon fa fa-edit"></i>
+                                <p>ENTRI OMSET & KUNJUNGAN</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?=base_url('koordinator_pendamping/entri');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='entri') echo('active');?>">
+                                <i class="nav-icon fa fa-edit"></i>
+                                <p>CAPAIAN INDIKATOR</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?=base_url('koordinator_pendamping/laporan');?>" class="nav-link <?php if($uri1=='koordinator_pendamping' && $uri2=='laporan') echo('active');?>">
+                                <i class="nav-icon fa fa-print"></i>
+                                <p>LAPORAN</p>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                         <?php
                         if($is_admin) {
                             ?>
