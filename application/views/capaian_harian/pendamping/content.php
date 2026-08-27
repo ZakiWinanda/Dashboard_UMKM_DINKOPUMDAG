@@ -1,19 +1,21 @@
+<?php if (empty($hide_content_filter)): ?>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <div class="row align-items-center">
             <!-- Dropdown SWK -->
             <div class="col-md-5 col-sm-12 mb-2">
-                <select name="pilih_swk" id="pilih_swk" class="form-control">
+                <select name="pilih_swk" id="pilih_swk" class="form-control select2" style="width: 100%;">
                     <option value="">- Pilih SWK -</option>
                     <?php if (!empty($list_swk)): ?>
                         <?php foreach ($list_swk as $swk): ?>
                             <?php 
                                 // Mengambil nilai ID SWK secara konsisten
-                                $val_idswk = $swk['idswk'] ?? $swk['id_swk'] ?? $swk['id']; 
+                                $val_idswk = is_array($swk) ? ($swk['idswk'] ?? $swk['id_swk'] ?? $swk['id'] ?? '') : ($swk->idswk ?? $swk->id ?? ''); 
+                                $val_nama  = is_array($swk) ? ($swk['nama_swk'] ?? $swk['name'] ?? '') : ($swk->nama_swk ?? $swk->name ?? ''); 
                                 $is_single = (count($list_swk) == 1) ? 'selected' : '';
                             ?>
                             <option value="<?= htmlspecialchars($val_idswk); ?>" <?= $is_single; ?>>
-                                <?= htmlspecialchars($swk['nama_swk'] ?? $swk['name']); ?>
+                                <?= htmlspecialchars($val_nama); ?>
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -42,6 +44,7 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Card Tabel Omset Harian -->
 <div class="card card-success card-outline mb-4">

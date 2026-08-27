@@ -17,7 +17,5 @@
     </div>
 </div>
 
-<?php $this->load->view('footer');?>
-<?php $this->load->view('capaian_harian/koordinator_pendamping/script');?>
 </body>
 </html>

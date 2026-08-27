@@ -44,6 +44,9 @@
                     html += '<option value="'+valId+'">'+row.nama_swk+'</option>';
                 });
                 $('#pilih_swk').html(html);
+                if ($.fn.select2) {
+                    $('#pilih_swk').trigger('change.select2');
+                }
             }
         });
     });

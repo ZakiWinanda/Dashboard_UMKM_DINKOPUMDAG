@@ -44,6 +44,7 @@ class Capaian_harian extends MY_Controller
         } elseif ($role == 'administrator') {
             $this->load->view('capaian_harian/administrator/index', $data);
             $this->load->view('footer');
+            $this->load->view('capaian_harian/koordinator_pendamping/script', $data);
 
         } else { // Role Pimpinan
             $this->load->view('capaian_harian/pimpinan/index', $data);

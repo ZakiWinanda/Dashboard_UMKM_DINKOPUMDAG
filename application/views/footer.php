@@ -68,7 +68,12 @@
 <script src="<?=base_url();?>assets/js/adminlte.min.js"></script>
 <script type="text/javascript">
     console.warn = function() {};
-    $(".select2").select2();
+    // Inisialisasi Select2 hanya jika belum diinisialisasi (cegah double container)
+    $('select.select2').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({ width: '100%' });
+        }
+    });
     $('.uang').inputmask('decimal', {
         alias: 'numeric',
         groupSeparator: '.',
