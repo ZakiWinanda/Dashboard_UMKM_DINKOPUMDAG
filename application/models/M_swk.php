@@ -155,48 +155,13 @@ class M_swk extends CI_Model
             ->row();
     }
     /**
-     * Otentikasi dan mengambil bearer token
+     * Otentikasi dan mengambil bearer token secara terpusat (.env style)
      */
-    public function get_api_token(){
+    public function get_api_token()
+    {
+        return $this->api_client->get_token();
+    }
 
-        $curl = curl_init();
-        $payload = json_encode([
-            'username' => 'api_integration',
-            'password' => 'Integration@2026!'
-        ]);
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL            => $this->api_base_url . '/auth/login',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 30,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPHEADER     => array(
-                'Content-Type: application/json',
-                'Accept: application/json'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-
-        if ($err || empty($response)) {
-            log_message('error', 'API Login Error: ' . $err);
-            return false;
-        }
-
-        $result = json_decode($response, true);
-
-        // Ambil accessToken sesuai struktur JSON API
-        if (isset($result['data']['token']['accessToken'])) {
-            return $result['data']['token']['accessToken'];
-        }
-
-        return false;
-}
     /**
      * Mengambil daftar nama SWK dari API
      */
@@ -206,7 +171,8 @@ class M_swk extends CI_Model
             return [];
         }
 
-        $url = $this->api_base_url . '/integration/swk?' . http_build_query([
+        $baseUrl = $this->api_client->get_base_url();
+        $url = $baseUrl . '/integration/swk?' . http_build_query([
             'search'             => '',
             'updated_at_start'   => '',
             'updated_at_end'     => '',

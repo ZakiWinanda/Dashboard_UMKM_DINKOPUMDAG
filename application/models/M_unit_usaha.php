@@ -11,34 +11,7 @@ class M_unit_usaha extends CI_Model
 
     private function _api_token()
     {
-        $payload = json_encode([
-            'username' => 'api_integration',
-            'password' => 'Integration@2026!'
-        ]);
-
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL            => $this->api_base_url . '/auth/login',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json','Accept: application/json'],
-        ]);
-
-        $response = curl_exec($curl);
-        $err      = curl_error($curl);
-        curl_close($curl);
-
-        if ($err || empty($response)) {
-            log_message('error', 'M_unit_usaha API login error: ' . $err);
-            return false;
-        }
-
-        $result = json_decode($response, true);
-        return $result['data']['token']['accessToken'] ?? false;
+        return $this->api_client->get_token();
     }
 
     /**
@@ -52,11 +25,12 @@ class M_unit_usaha extends CI_Model
         $token = $this->_api_token();
         if (!$token) return [];
 
-        $all   = [];
-        $page  = 1;
+        $all     = [];
+        $page    = 1;
+        $baseUrl = $this->api_client->get_base_url();
 
         do {
-            $url = $this->api_base_url . '/integration/swk-usaha?' . http_build_query([
+            $url = $baseUrl . '/integration/swk-usaha?' . http_build_query([
                 'swk_id'   => $swk_id,
                 'per_page' => $per_page,
                 'page'     => $page,

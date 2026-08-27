@@ -97,7 +97,7 @@ class Input_harian extends MY_Controller {
     }
 
     /**
-     * Unduh Template Native Excel XML 2003 (.xls) tanpa Pop-Up Warning di MS Excel
+     * Unduh Template Native Excel Modern (.xlsx) per Hari dengan Nama SWK & Nama User
      */
     public function download_template()
     {
@@ -109,6 +109,7 @@ class Input_harian extends MY_Controller {
             $tanggal = date('Y-m-d');
         }
 
+        $nama_swk = 'SWK';
         $swkRow = $this->db->group_start()
             ->where('idswk', $idswk_lokal)
             ->or_where('api_swk_id', $idswk_lokal)
@@ -120,6 +121,7 @@ class Input_harian extends MY_Controller {
         if ($swkRow) {
             $idswk_lokal = $swkRow->idswk;
             if (!empty($swkRow->api_swk_id)) $idswk_api = $swkRow->api_swk_id;
+            if (!empty($swkRow->nama_swk))   $nama_swk   = $swkRow->nama_swk;
         }
 
         $parts = explode('-', $tanggal);
@@ -130,80 +132,100 @@ class Input_harian extends MY_Controller {
         $omset_map     = $this->M_unit_usaha->getOmsetBulan($idswk_lokal, $bulan, $tahun);
         $kunjungan_map = $this->M_unit_usaha->getKunjunganBulan($idswk_lokal, $bulan, $tahun);
 
-        $filename = "Template_Input_Harian_" . $tanggal . ".xls";
+        $tmpXlsx = tempnam(sys_get_temp_dir(), 'xlsx_') . '.xlsx';
+        if (file_exists($tmpXlsx)) @unlink($tmpXlsx);
 
-        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
+        $zip = new ZipArchive();
+        if ($zip->open($tmpXlsx, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            // [Content_Types].xml
+            $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>');
 
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        echo '<?mso-application progid="Excel.Sheet"?>' . "\n";
-        echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"' . "\n";
-        echo ' xmlns:o="urn:schemas-microsoft-com:office:office"' . "\n";
-        echo ' xmlns:x="urn:schemas-microsoft-com:office:excel"' . "\n";
-        echo ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"' . "\n";
-        echo ' xmlns:html="http://www.w3.org/TR/REC-html40">' . "\n";
-        echo ' <Styles>' . "\n";
-        echo '  <Style ss:ID="Header">' . "\n";
-        echo '   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>' . "\n";
-        echo '   <Interior ss:Color="#1F4E78" ss:Pattern="Solid"/>' . "\n";
-        echo '   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>' . "\n";
-        echo '  </Style>' . "\n";
-        echo '  <Style ss:ID="TextCell">' . "\n";
-        echo '   <Font ss:FontName="Calibri" ss:Size="11"/>' . "\n";
-        echo '   <NumberFormat ss:Format="@"/>' . "\n";
-        echo '  </Style>' . "\n";
-        echo '  <Style ss:ID="NumberCell">' . "\n";
-        echo '   <Font ss:FontName="Calibri" ss:Size="11"/>' . "\n";
-        echo '   <NumberFormat ss:Format="#,##0"/>' . "\n";
-        echo '   <Alignment ss:Horizontal="Right"/>' . "\n";
-        echo '  </Style>' . "\n";
-        echo ' </Styles>' . "\n";
+            // _rels/.rels
+            $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
 
-        echo ' <Worksheet ss:Name="Template Input">' . "\n";
-        echo '  <Table>' . "\n";
-        echo '   <Column ss:Width="250"/>' . "\n";
-        echo '   <Column ss:Width="80"/>' . "\n";
-        echo '   <Column ss:Width="110"/>' . "\n";
-        echo '   <Column ss:Width="160"/>' . "\n";
-        echo '   <Column ss:Width="160"/>' . "\n";
-        echo '   <Column ss:Width="100"/>' . "\n";
-        echo '   <Column ss:Width="100"/>' . "\n";
-        echo '   <Column ss:Width="100"/>' . "\n";
+            // xl/_rels/workbook.xml.rels
+            $zip->addFromString('xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
 
-        // Header Row
-        echo '   <Row ss:StyleID="Header" ss:Height="24">' . "\n";
-        echo '    <Cell><Data ss:Type="String">id_unit_usaha</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">kode_stand</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">kode_usaha</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">nama_usaha</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">nama_pedagang</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">tanggal</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">omset</Data></Cell>' . "\n";
-        echo '    <Cell><Data ss:Type="String">kunjungan</Data></Cell>' . "\n";
-        echo '   </Row>' . "\n";
+            // xl/workbook.xml
+            $zip->addFromString('xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Template Input" sheetId="1" r:id="rId1"/></sheets></workbook>');
 
-        // Data Rows
-        foreach ($units as $u) {
-            $uid = $u['id'];
-            $om  = $omset_map[$uid][$tanggal] ?? 0;
-            $kj  = $kunjungan_map[$uid][$tanggal] ?? 0;
+            // xl/styles.xml
+            $zip->addFromString('xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1F4E78"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/></border><border><left style="thin"><color rgb="FFD9D9D9"/></left><right style="thin"><color rgb="FFD9D9D9"/></right><top style="thin"><color rgb="FFD9D9D9"/></top><bottom style="thin"><color rgb="FFD9D9D9"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/><xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"><alignment horizontal="right"/></xf></cellXfs></styleSheet>');
 
-            echo '   <Row>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($uid) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($u['namaStand']) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($u['kodeUsahaSwk']) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($u['namaUsaha']) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($u['namaPedagang']) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="TextCell"><Data ss:Type="String">' . htmlspecialchars($tanggal) . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="NumberCell"><Data ss:Type="Number">' . (int)$om . '</Data></Cell>' . "\n";
-            echo '    <Cell ss:StyleID="NumberCell"><Data ss:Type="Number">' . (int)$kj . '</Data></Cell>' . "\n";
-            echo '   </Row>' . "\n";
+            // Build xl/worksheets/sheet1.xml
+            $sheetXml  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+            $sheetXml .= '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+            $sheetXml .= '<cols>';
+            $sheetXml .= '<col min="1" max="1" width="38" customWidth="1"/>';
+            $sheetXml .= '<col min="2" max="2" width="14" customWidth="1"/>';
+            $sheetXml .= '<col min="3" max="3" width="18" customWidth="1"/>';
+            $sheetXml .= '<col min="4" max="4" width="28" customWidth="1"/>';
+            $sheetXml .= '<col min="5" max="5" width="26" customWidth="1"/>';
+            $sheetXml .= '<col min="6" max="6" width="16" customWidth="1"/>';
+            $sheetXml .= '<col min="7" max="7" width="18" customWidth="1"/>';
+            $sheetXml .= '<col min="8" max="8" width="16" customWidth="1"/>';
+            $sheetXml .= '</cols>';
+            $sheetXml .= '<sheetData>';
+
+            // Header Row (Row 1)
+            $sheetXml .= '<row r="1" ht="26" customHeight="1">';
+            $sheetXml .= '<c r="A1" t="inlineStr" s="1"><is><t>id_unit_usaha</t></is></c>';
+            $sheetXml .= '<c r="B1" t="inlineStr" s="1"><is><t>kode_stand</t></is></c>';
+            $sheetXml .= '<c r="C1" t="inlineStr" s="1"><is><t>kode_usaha</t></is></c>';
+            $sheetXml .= '<c r="D1" t="inlineStr" s="1"><is><t>nama_usaha</t></is></c>';
+            $sheetXml .= '<c r="E1" t="inlineStr" s="1"><is><t>nama_pedagang</t></is></c>';
+            $sheetXml .= '<c r="F1" t="inlineStr" s="1"><is><t>tanggal</t></is></c>';
+            $sheetXml .= '<c r="G1" t="inlineStr" s="1"><is><t>omset</t></is></c>';
+            $sheetXml .= '<c r="H1" t="inlineStr" s="1"><is><t>kunjungan</t></is></c>';
+            $sheetXml .= '</row>';
+
+            // Data Rows (Row 2++)
+            $rowNum = 2;
+            foreach ($units as $u) {
+                $uid = $u['id'];
+                $om  = (int)($omset_map[$uid][$tanggal] ?? 0);
+                $kj  = (int)($kunjungan_map[$uid][$tanggal] ?? 0);
+
+                $sheetXml .= '<row r="' . $rowNum . '">';
+                $sheetXml .= '<c r="A' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($uid, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="B' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($u['namaStand'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="C' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($u['kodeUsahaSwk'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="D' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($u['namaUsaha'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="E' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($u['namaPedagang'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="F' . $rowNum . '" t="inlineStr" s="2"><is><t>' . htmlspecialchars($tanggal, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</t></is></c>';
+                $sheetXml .= '<c r="G' . $rowNum . '" s="3"><v>' . $om . '</v></c>';
+                $sheetXml .= '<c r="H' . $rowNum . '" s="3"><v>' . $kj . '</v></c>';
+                $sheetXml .= '</row>';
+
+                $rowNum++;
+            }
+
+            $sheetXml .= '</sheetData>';
+            $sheetXml .= '</worksheet>';
+
+            $zip->addFromString('xl/worksheets/sheet1.xml', $sheetXml);
+            $zip->close();
         }
 
-        echo '  </Table>' . "\n";
-        echo ' </Worksheet>' . "\n";
-        echo '</Workbook>' . "\n";
+        // Susun Nama File: Template_Input_Harian_[SWK]_[User]_[Tanggal].xlsx
+        $swk_clean  = preg_replace('/[^A-Za-z0-9]/', '_', $nama_swk);
+        $user_clean = preg_replace('/[^A-Za-z0-9]/', '_', !empty($this->nama) ? $this->nama : ($this->nip ?? 'User'));
+
+        $swk_clean  = preg_replace('/_+/', '_', trim($swk_clean, '_'));
+        $user_clean = preg_replace('/_+/', '_', trim($user_clean, '_'));
+
+        if (empty($swk_clean))  $swk_clean  = 'SWK';
+        if (empty($user_clean)) $user_clean = 'User';
+
+        $filename = "Template_Input_Harian_" . $swk_clean . "_" . $user_clean . "_" . $tanggal . ".xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . filesize($tmpXlsx));
+        header('Cache-Control: max-age=0');
+
+        readfile($tmpXlsx);
+        @unlink($tmpXlsx);
         exit;
     }
 
@@ -373,7 +395,7 @@ class Input_harian extends MY_Controller {
     }
 
     /**
-     * Reader Multi-Format (Native Excel XML, XLSX Zip, HTML Table, CSV)
+     * Reader Multi-Format (Native Excel XLSX Zip, XML 2003, HTML Table, CSV)
      */
     private function _parseFileToRows($filePath)
     {
@@ -382,7 +404,7 @@ class Input_harian extends MY_Controller {
 
         if (empty($content)) return [];
 
-        // 1. Coba XLSX (Zip XML Excel)
+        // 1. Coba XLSX (Zip XML Excel Modern)
         if (class_exists('ZipArchive')) {
             $zip = new ZipArchive();
             if ($zip->open($filePath) === TRUE) {
