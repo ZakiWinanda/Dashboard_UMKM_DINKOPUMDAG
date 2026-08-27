@@ -248,38 +248,104 @@ class M_swk extends CI_Model
 
     public function get_swk_by_user($nip, $role = 'pendamping')
     {
-        // 1. Ambil seluruh data SWK dari API
-        $all_swk = $this->get_api_swk();
-        if (empty($all_swk)) {
-            return [];
-        }
-
-        // 2. Jika Administrator / Pimpinan, tampilkan semua SWK
         if ($role == 'administrator' || $role == 'pimpinan') {
-            return $all_swk;
-        }
-        // 3. Ambil penugasan dari tabel pendamping_swk berdasarkan NIP
-        $this->db->select('idswk');
-        $this->db->where('nip', $nip);
-        $assigned = $this->db->get('pendamping_swk')->result_array();
-
-        if (empty($assigned)) {
-            return [];
+            return $this->db
+                ->select('idswk, api_swk_id, nama_swk')
+                ->where('aktif', 1)
+                ->order_by('nama_swk', 'ASC')
+                ->get('m_swk')
+                ->result_array();
         }
 
-        $assigned_ids = array_column($assigned, 'idswk');
+        if ($role == 'koordinator_pendamping') {
+            $rows = $this->db
+                ->select('DISTINCT(m_swk.idswk), m_swk.api_swk_id, m_swk.nama_swk', FALSE)
+                ->from('koordinator_pendamping kp')
+                ->join('pendamping_swk ps', 'ps.nip = kp.nip_pendamping')
+                ->join('m_swk', 'm_swk.idswk = ps.idswk')
+                ->where('kp.nip_koordinator', $nip)
+                ->where('m_swk.aktif', 1)
+                ->order_by('m_swk.nama_swk', 'ASC')
+                ->get()
+                ->result_array();
 
-        // 4. Cocokkan ID dari API dengan data penugasan NIP
-        $filtered_swk = [];
-        foreach ($all_swk as $swk) {
-            if (in_array($swk['id'], $assigned_ids)) {
-                $filtered_swk[] = $swk;
+            if (!empty($rows)) {
+                return $rows;
             }
         }
 
-        return $filtered_swk;
+        // Role Pendamping
+        $rows = $this->db
+            ->select('DISTINCT(m_swk.idswk), m_swk.api_swk_id, m_swk.nama_swk', FALSE)
+            ->from('pendamping_swk')
+            ->join('m_swk', 'm_swk.idswk = pendamping_swk.idswk')
+            ->where('pendamping_swk.nip', $nip)
+            ->where('m_swk.aktif', 1)
+            ->order_by('m_swk.nama_swk', 'ASC')
+            ->get()
+            ->result_array();
 
+        if (!empty($rows)) {
+            return $rows;
+        }
+
+        // Fallback jika belum ada penugasan NIP spesifik
+        return $this->db
+            ->select('idswk, api_swk_id, nama_swk')
+            ->where('aktif', 1)
+            ->order_by('nama_swk', 'ASC')
+            ->get('m_swk')
+            ->result_array();
     }
+
+
+    /**
+     * Ambil semua SWK aktif sebagai array [id, nama_swk, api_swk_id]
+     */
+    public function get_all_as_array()
+    {
+        $rows = $this->db
+            ->select('idswk, api_swk_id, nama_swk')
+            ->where('aktif', 1)
+            ->order_by('nama_swk', 'ASC')
+            ->get('m_swk')
+            ->result_array();
+
+        return array_map(function($r) {
+            return [
+                'id'         => $r['idswk'],
+                'idswk'      => $r['idswk'],
+                'api_swk_id' => $r['api_swk_id'],
+                'nama_swk'   => $r['nama_swk']
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Ambil SWK berdasarkan NIP pendamping sebagai array [id, nama_swk, api_swk_id]
+     */
+    public function get_by_pendamping_array($nip)
+    {
+        $rows = $this->db
+            ->select('m_swk.idswk, m_swk.api_swk_id, m_swk.nama_swk')
+            ->from('pendamping_swk')
+            ->join('m_swk', 'm_swk.idswk = pendamping_swk.idswk')
+            ->where('pendamping_swk.nip', $nip)
+            ->where('m_swk.aktif', 1)
+            ->order_by('m_swk.nama_swk', 'ASC')
+            ->get()
+            ->result_array();
+
+        return array_map(function($r) {
+            return [
+                'id'         => $r['idswk'],
+                'idswk'      => $r['idswk'],
+                'api_swk_id' => $r['api_swk_id'],
+                'nama_swk'   => $r['nama_swk']
+            ];
+        }, $rows);
+    }
+
 
 
 }

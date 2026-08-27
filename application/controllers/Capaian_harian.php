@@ -18,7 +18,10 @@ class Capaian_harian extends MY_Controller
         $role      = $monev_swk['role'] ?? $this->session->userdata('role');
 
         // 1. Ambil list SWK berdasarkan NIP user yang login
-        $data['list_swk'] = $this->M_swk->get_swk_by_user($nip, $role);
+        $list_swk = $this->M_swk->get_swk_by_user($nip, $role);
+        $data['list_swk']   = $list_swk;
+        $data['swk']        = $list_swk;
+        $data['pendamping'] = ($role == 'administrator' || $role == 'pimpinan' || $role == 'koordinator_pendamping') ? $this->M_pengguna->get_pendamping() : [];
 
         // 2. Data pendukung ke view
         $data['nip']   = $nip;
