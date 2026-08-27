@@ -123,6 +123,12 @@
                         ?>
 
                         <li class="nav-item">
+                            <a href="<?=base_url('input_harian');?>" class="nav-link <?php if($uri1=='input_harian') echo('active');?>">
+                                <i class="nav-icon fa fa-edit"></i>
+                                <p>INPUT OMSET & KUNJUNGAN</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="<?=base_url('capaian_harian');?>" class="nav-link <?php if($uri1=='capaian_harian') echo('active');?>">
                                 <i class="nav-icon fa fa-edit"></i>
                                 <p>REKAP OMSET & KUNJUNGAN</p>
