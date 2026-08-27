@@ -7,6 +7,7 @@ var ST = {
     idswk_lokal : '',
     idswk_api   : '',
     nama_swk    : '',
+    tanggal     : '',
     tahun       : 0,
     bulan       : 0,
     hari        : 0,
@@ -19,33 +20,38 @@ $(document).ready(function() {
 
     $('#pilihSwk').select2({ dropdownParent: $('body'), width: '100%' });
 
+    // Tombol Buka Modal Panduan
+    $('#btnPanduan').on('click', function() {
+        $('#modalPanduan').modal('show');
+    });
+
     // Tampilkan Data Grid
     $('#btnTampilkan').on('click', function() {
         var idswk   = $('#pilihSwk').val();
         var opt     = $('#pilihSwk option:selected');
         var namaSwk = opt.data('nama') || opt.text();
         var apiId   = opt.data('api-id') || idswk;
-        var periode = $('#pilihPeriode').val();
+        var tanggal = $('#pilihTanggal').val();
 
         if (!idswk)   return Swal.fire('Perhatian','Pilih SWK terlebih dahulu.','warning');
-        if (!periode) return Swal.fire('Perhatian','Pilih bulan dan tahun.','warning');
+        if (!tanggal) return Swal.fire('Perhatian','Pilih tanggal terlebih dahulu.','warning');
 
-        loadData(idswk, apiId, namaSwk, periode);
+        loadData(idswk, apiId, namaSwk, tanggal);
     });
 
-    // Unduh Template Excel
+    // Unduh Template Excel (.xls per Hari)
     $('#btnDownloadTemplate').on('click', function() {
         var idswk   = $('#pilihSwk').val();
         var opt     = $('#pilihSwk option:selected');
         var apiId   = opt.data('api-id') || idswk;
-        var periode = $('#pilihPeriode').val();
+        var tanggal = $('#pilihTanggal').val();
 
         if (!idswk)   return Swal.fire('Perhatian','Pilih SWK terlebih dahulu sebelum mengunduh template.','warning');
-        if (!periode) return Swal.fire('Perhatian','Pilih bulan dan tahun terlebih dahulu.','warning');
+        if (!tanggal) return Swal.fire('Perhatian','Pilih tanggal terlebih dahulu.','warning');
 
         var url = BASE_URL + 'input_harian/download_template?idswk_lokal=' + encodeURIComponent(idswk) +
                   '&idswk_api=' + encodeURIComponent(apiId) +
-                  '&periode=' + encodeURIComponent(periode);
+                  '&tanggal=' + encodeURIComponent(tanggal);
 
         window.location.href = url;
     });
@@ -55,18 +61,15 @@ $(document).ready(function() {
         var idswk   = $('#pilihSwk').val();
         var opt     = $('#pilihSwk option:selected');
         var namaSwk = opt.data('nama') || opt.text();
-        var periode = $('#pilihPeriode').val();
+        var tanggal = $('#pilihTanggal').val();
 
         if (!idswk)   return Swal.fire('Perhatian','Pilih SWK terlebih dahulu.','warning');
-        if (!periode) return Swal.fire('Perhatian','Pilih bulan dan tahun.','warning');
-
-        var pParts = periode.split('-');
-        var pLabel = NAMA_BULAN[parseInt(pParts[1], 10) - 1] + ' ' + pParts[0];
+        if (!tanggal) return Swal.fire('Perhatian','Pilih tanggal terlebih dahulu.','warning');
 
         $('#up_idswk_lokal').val(idswk);
-        $('#up_periode').val(periode);
+        $('#up_tanggal').val(tanggal);
         $('#up_label_swk').val(namaSwk);
-        $('#up_label_periode').val(pLabel);
+        $('#up_label_tanggal').val(fmtTglHuman(tanggal));
         $('#file_excel').val('');
         $('#fileLabel').text('Pilih file…');
 
@@ -109,8 +112,8 @@ $(document).ready(function() {
                     var opt     = $('#pilihSwk option:selected');
                     var namaSwk = opt.data('nama') || opt.text();
                     var apiId   = opt.data('api-id') || idswk;
-                    var periode = $('#pilihPeriode').val();
-                    loadData(idswk, apiId, namaSwk, periode);
+                    var tanggal = $('#pilihTanggal').val();
+                    loadData(idswk, apiId, namaSwk, tanggal);
 
                 } else {
                     Swal.fire('Gagal Impor', res.message || 'Terjadi kesalahan saat membaca file.', 'error');
@@ -125,7 +128,7 @@ $(document).ready(function() {
 });
 
 // ─── Load Data dari Server ───────────────────────────────────
-function loadData(idswk_lokal, idswk_api, nama_swk, periode)
+function loadData(idswk_lokal, idswk_api, nama_swk, tanggal)
 {
     $('#emptyState').hide();
     $('#kalenderWrap').hide();
@@ -136,7 +139,7 @@ function loadData(idswk_lokal, idswk_api, nama_swk, periode)
         url  : BASE_URL + 'input_harian/load_unit_usaha',
         type : 'POST',
         dataType : 'json',
-        data : { idswk_lokal: idswk_lokal, idswk_api: idswk_api, periode: periode },
+        data : { idswk_lokal: idswk_lokal, idswk_api: idswk_api, tanggal: tanggal },
         success: function(res) {
             $('#loadingState').hide();
 
@@ -149,17 +152,18 @@ function loadData(idswk_lokal, idswk_api, nama_swk, periode)
             ST.idswk_lokal = idswk_lokal;
             ST.idswk_api   = idswk_api;
             ST.nama_swk    = nama_swk;
+            ST.tanggal     = tanggal;
             ST.tahun       = res.tahun;
             ST.bulan       = res.bulan;
-            ST.hari        = res.jumlah_hari;
+            ST.hari        = calDays(res.tahun, res.bulan);
             ST.units       = res.units;
             ST.omset       = res.omset    || {};
             ST.kunjungan   = res.kunjungan || {};
 
             renderKalender();
 
-            var label = NAMA_BULAN[res.bulan-1] + ' ' + res.tahun;
-            $('#badgePeriode').text(label).show();
+            var label = fmtTglHuman(tanggal);
+            $('#badgeTanggal').text(label).show();
             $('#badgeSwk').text(nama_swk).show();
 
             $('#totalUnit').text(res.units.length);
@@ -178,7 +182,7 @@ function loadData(idswk_lokal, idswk_api, nama_swk, periode)
     });
 }
 
-// ─── Render Grid Kalender (Read-Only Summary) ────────────────
+// ─── Render Grid Kalender ────────────────────────────────────
 function renderKalender()
 {
     var todayStr = getToday();
@@ -193,7 +197,8 @@ function renderKalender()
         var tgl    = fmtTgl(ST.tahun, ST.bulan, d);
         var hari   = new Date(tgl).getDay();
         var isMggu = hari === 0;
-        var cls = 'text-center' + (isMggu ? ' text-danger' : '');
+        var isSelected = tgl === ST.tanggal;
+        var cls = 'text-center' + (isMggu ? ' text-danger' : '') + (isSelected ? ' bg-warning text-dark font-weight-bold' : '');
         head += '<th class="' + cls + '">' + NAMA_HARI[hari] + '<br>' + d + '</th>';
 
         dailyOmset[tgl]     = 0;
@@ -227,8 +232,8 @@ function renderKalender()
             var tgl    = fmtTgl(ST.tahun, ST.bulan, d);
             var hari   = new Date(tgl).getDay();
             var isMggu = hari === 0;
-            var isToday = tgl === todayStr;
-            var colCls = (isMggu ? ' col-minggu' : '') + (isToday ? ' today-col' : '');
+            var isSelected = tgl === ST.tanggal;
+            var colCls = (isMggu ? ' col-minggu' : '') + (isSelected ? ' today-col' : '');
 
             var omVal  = (ST.omset[uid] && ST.omset[uid][tgl]) ? parseFloat(ST.omset[uid][tgl]) : 0;
             var omTxt  = omVal > 0 ? rupiah(omVal) : '<span class="text-muted">-</span>';
@@ -263,7 +268,13 @@ function renderKalender()
     $('#footKunjungan').html(footKj);
 }
 
+function calDays(y, m) { return new Date(y, m, 0).getDate(); }
 function fmtTgl(y, m, d) { return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+function fmtTglHuman(tgl) {
+    if (!tgl) return '';
+    var p = tgl.split('-');
+    return parseInt(p[2],10) + ' ' + NAMA_BULAN[parseInt(p[1],10)-1] + ' ' + p[0];
+}
 function getToday() { var n = new Date(); return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0'); }
 function rupiah(v) { v = parseFloat(v)||0; return 'Rp ' + v.toLocaleString('id-ID'); }
 function fmtKj(v) { v = parseInt(v)||0; return v.toLocaleString('id-ID') + ' orang'; }

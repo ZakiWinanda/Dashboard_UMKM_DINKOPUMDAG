@@ -4,11 +4,11 @@
             <div class="row mb-2 align-items-center">
                 <div class="col-sm-7">
                     <h1 class="font-weight-bold m-0" style="font-size:1.25rem;">
-                        <i class="fa fa-file-excel mr-2 text-success"></i>UPLOAD OMSET &amp; KUNJUNGAN HARIAN (EXCEL)
+                        <i class="fa fa-file-excel mr-2 text-success"></i>INPUT OMSET &amp; KUNJUNGAN HARIAN (EXCEL)
                     </h1>
                 </div>
                 <div class="col-sm-5 text-right">
-                    <span id="badgePeriode" class="badge badge-primary px-3 py-2 mr-1" style="font-size:.8rem;display:none;"></span>
+                    <span id="badgeTanggal" class="badge badge-primary px-3 py-2 mr-1" style="font-size:.8rem;display:none;"></span>
                     <span id="badgeSwk" class="badge badge-secondary px-3 py-2" style="font-size:.8rem;display:none;"></span>
                 </div>
             </div>
@@ -22,7 +22,7 @@
             <div class="card shadow-sm mb-3">
                 <div class="card-body py-3">
                     <div class="row align-items-end">
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-2">
                             <label class="small font-weight-bold text-muted mb-1">SWK</label>
                             <select id="pilihSwk" class="form-control select2">
                                 <option value="">— Pilih Sentra Wisata Kuliner —</option>
@@ -36,12 +36,15 @@
                             </select>
                         </div>
                         <div class="col-md-3 mb-2">
-                            <label class="small font-weight-bold text-muted mb-1">BULAN &amp; TAHUN</label>
-                            <input type="month" id="pilihPeriode" class="form-control" value="<?= date('Y-m'); ?>">
+                            <label class="small font-weight-bold text-muted mb-1">TANGGAL INPUT</label>
+                            <input type="date" id="pilihTanggal" class="form-control" value="<?= date('Y-m-d'); ?>">
                         </div>
-                        <div class="col-md-5 mb-2 text-right">
+                        <div class="col-md-6 mb-2 text-right">
                             <button type="button" id="btnTampilkan" class="btn btn-primary mr-1">
                                 <i class="fa fa-search mr-1"></i> Tampilkan Data
+                            </button>
+                            <button type="button" id="btnPanduan" class="btn btn-outline-info mr-1">
+                                <i class="fa fa-info-circle mr-1"></i> Panduan
                             </button>
                             <button type="button" id="btnDownloadTemplate" class="btn btn-outline-success mr-1">
                                 <i class="fa fa-download mr-1"></i> Unduh Template
@@ -69,7 +72,7 @@
                     <div class="info-box bg-gradient-success shadow-sm mb-0">
                         <span class="info-box-icon"><i class="fas fa-money-bill-wave"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Total Omset SWK</span>
+                            <span class="info-box-text">Total Omset Bulan Ini</span>
                             <span class="info-box-number" id="totalOmsetSwk">Rp 0</span>
                         </div>
                     </div>
@@ -78,7 +81,7 @@
                     <div class="info-box bg-gradient-info shadow-sm mb-0">
                         <span class="info-box-icon"><i class="fas fa-users"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Total Kunjungan SWK</span>
+                            <span class="info-box-text">Total Kunjungan Bulan Ini</span>
                             <span class="info-box-number" id="totalKunjunganSwk">0 orang</span>
                         </div>
                     </div>
@@ -94,7 +97,7 @@
             <!-- Empty -->
             <div id="emptyState" class="text-center py-5">
                 <i class="fa fa-file-excel fa-4x text-muted mb-3 d-block"></i>
-                <p class="text-muted">Pilih SWK &amp; periode, lalu klik <strong>Tampilkan Data</strong> atau <strong>Upload Excel</strong>.</p>
+                <p class="text-muted">Pilih SWK &amp; Tanggal, lalu klik <strong>Tampilkan Data</strong> atau <strong>Upload Excel</strong>.</p>
             </div>
 
             <!-- Nav Tab Omset / Kunjungan -->
@@ -160,9 +163,65 @@
     </section>
 </div>
 
+<!-- ═══ MODAL PANDUAN PENGGUNAAN (POP UP ALERT) ═══ -->
+<div class="modal fade" id="modalPanduan" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-info text-white py-2">
+                <h6 class="modal-title font-weight-bold"><i class="fa fa-book-reader mr-2"></i>Panduan Pengisian &amp; Upload Excel Harian</h6>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning border-left py-2 mb-4" style="border-left: 4px solid #ffc107 !important;">
+                    <div class="font-weight-bold text-dark mb-1">
+                        <i class="fa fa-exclamation-triangle text-warning mr-1"></i> ATURAN PENTING PENGISIAN FILE EXCEL:
+                    </div>
+                    <ul class="mb-0 text-dark pl-3" style="font-size:.85rem;">
+                        <li>HANYA isi atau ubah angka pada kolom <strong>omset</strong> dan <strong>kunjungan</strong>.</li>
+                        <li><strong class="text-danger">DILARANG SANGAT</strong> mengedit, mengganti, atau menghapus isi kolom <code>id_unit_usaha</code> dan <code>tanggal</code> agar data teridentifikasi oleh sistem.</li>
+                    </ul>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border shadow-xs">
+                            <div class="card-body text-center p-3">
+                                <div class="badge badge-primary px-3 py-2 rounded-circle mb-2" style="font-size:1.1rem;">1</div>
+                                <h6 class="font-weight-bold text-primary">Unduh Template</h6>
+                                <p class="small text-muted mb-0">Pilih <strong>SWK</strong> &amp; <strong>Tanggal Input</strong> pada filter, lalu klik tombol <strong class="text-success"><i class="fa fa-download"></i> Unduh Template</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border shadow-xs">
+                            <div class="card-body text-center p-3">
+                                <div class="badge badge-warning px-3 py-2 rounded-circle mb-2" style="font-size:1.1rem;color:#fff;">2</div>
+                                <h6 class="font-weight-bold text-warning">Isi Data di Excel</h6>
+                                <p class="small text-muted mb-0">Buka file Excel, lalu masukkan nominal omset dan jumlah pengunjung. Simpan file (<code>Ctrl+S</code>).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border shadow-xs">
+                            <div class="card-body text-center p-3">
+                                <div class="badge badge-success px-3 py-2 rounded-circle mb-2" style="font-size:1.1rem;">3</div>
+                                <h6 class="font-weight-bold text-success">Upload File</h6>
+                                <p class="small text-muted mb-0">Klik tombol <strong class="text-success"><i class="fa fa-file-upload"></i> Upload Excel</strong>, pilih file Excel Anda, lalu klik <strong>Impor Data</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2 text-right">
+                <button type="button" class="btn btn-info btn-sm px-4 font-weight-bold" data-dismiss="modal">Saya Mengerti</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ═══ MODAL UPLOAD EXCEL ═══ -->
 <div class="modal fade" id="modalUpload" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-success text-white py-2">
                 <h6 class="modal-title font-weight-bold"><i class="fa fa-file-upload mr-2"></i>Upload File Excel / CSV</h6>
@@ -171,11 +230,16 @@
             <form id="formUploadExcel" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" id="up_idswk_lokal" name="idswk_lokal">
-                    <input type="hidden" id="up_periode" name="periode">
+                    <input type="hidden" id="up_tanggal" name="tanggal">
 
-                    <div class="alert alert-info py-2 small mb-3">
-                        <i class="fa fa-info-circle mr-1"></i>
-                        Pastikan Anda mengunduh template terbaru untuk SWK dan Bulan-Tahun yang dipilih sebelum melakukan upload.
+                    <div class="alert alert-warning py-2 small mb-3 border-left" style="border-left: 4px solid #ffc107 !important;">
+                        <div class="font-weight-bold text-dark mb-1">
+                            <i class="fa fa-exclamation-triangle mr-1 text-warning"></i> INSTRUKSI PENTING:
+                        </div>
+                        <ul class="pl-3 mb-0 text-muted" style="font-size:.78rem;">
+                            <li>HANYA isi atau ubah data pada kolom <strong>omset</strong> dan <strong>kunjungan</strong>.</li>
+                            <li><strong>DILARANG SANGAT</strong> mengubah, mengedit, atau menghapus isi kolom <code>id_unit_usaha</code> dan <code>tanggal</code> agar data dapat teridentifikasi oleh sistem.</li>
+                        </ul>
                     </div>
 
                     <div class="form-group mb-2">
@@ -184,15 +248,15 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="small font-weight-bold">Periode</label>
-                        <input type="text" id="up_label_periode" class="form-control form-control-sm bg-light" readonly>
+                        <label class="small font-weight-bold">Tanggal Input</label>
+                        <input type="text" id="up_label_tanggal" class="form-control form-control-sm bg-light" readonly>
                     </div>
 
                     <div class="form-group mb-0">
-                        <label class="small font-weight-bold">Pilih File (.csv / .xlsx / .xls)</label>
+                        <label class="small font-weight-bold">Pilih File (.xls / .xlsx / .csv)</label>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="file_excel" name="file_excel"
-                                   accept=".csv, .xlsx, .xls" required>
+                                   accept=".xls, .xlsx, .csv" required>
                             <label class="custom-file-label text-truncate" for="file_excel" id="fileLabel">Pilih file…</label>
                         </div>
                     </div>
