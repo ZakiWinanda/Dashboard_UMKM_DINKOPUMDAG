@@ -12,12 +12,10 @@
     <div class="content">
         <div class="container-fluid">
             <?php $this->load->view('capaian_harian/koordinator_pendamping/filter');?>
-            <?php $this->load->view('capaian_harian/pendamping/content');?>
+            <?php $this->load->view('capaian_harian/pendamping/content', array('hide_content_filter' => true));?>
         </div>
     </div>
 </div>
 
-<?php $this->load->view('footer');?>
-<?php $this->load->view('capaian_harian/koordinator_pendamping/script');?>
 </body>
 </html>

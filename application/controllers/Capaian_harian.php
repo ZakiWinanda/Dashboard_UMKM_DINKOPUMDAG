@@ -18,7 +18,10 @@ class Capaian_harian extends MY_Controller
         $role      = $monev_swk['role'] ?? $this->session->userdata('role');
 
         // 1. Ambil list SWK berdasarkan NIP user yang login
-        $data['list_swk'] = $this->M_swk->get_swk_by_user($nip, $role);
+        $list_swk = $this->M_swk->get_swk_by_user($nip, $role);
+        $data['list_swk']   = $list_swk;
+        $data['swk']        = $list_swk;
+        $data['pendamping'] = ($role == 'administrator' || $role == 'pimpinan' || $role == 'koordinator_pendamping') ? $this->M_pengguna->get_pendamping() : [];
 
         // 2. Data pendukung ke view
         $data['nip']   = $nip;
@@ -41,6 +44,7 @@ class Capaian_harian extends MY_Controller
         } elseif ($role == 'administrator') {
             $this->load->view('capaian_harian/administrator/index', $data);
             $this->load->view('footer');
+            $this->load->view('capaian_harian/koordinator_pendamping/script', $data);
 
         } else { // Role Pimpinan
             $this->load->view('capaian_harian/pimpinan/index', $data);
@@ -51,7 +55,18 @@ class Capaian_harian extends MY_Controller
     public function load_data()
     {
         $idswk   = trim((string)$this->input->post('idswk'));
-        $periode = trim($this->input->post('filter_bulan_tahun'));
+        $periode = trim((string)$this->input->post('filter_bulan_tahun'));
+
+        if (empty($idswk)) {
+            $monev_swk = $this->session->userdata('monev_swk');
+            $nip       = $monev_swk['nip'] ?? $this->session->userdata('nip');
+            $role      = $monev_swk['role'] ?? $this->session->userdata('role');
+            $list_swk  = $this->M_swk->get_swk_by_user($nip, $role);
+            if (!empty($list_swk)) {
+                $first = current($list_swk);
+                $idswk = is_array($first) ? ($first['idswk'] ?? $first['id'] ?? '') : ($first->idswk ?? $first->id ?? '');
+            }
+        }
 
         if (empty($periode)) {
             $periode = date('m-Y');

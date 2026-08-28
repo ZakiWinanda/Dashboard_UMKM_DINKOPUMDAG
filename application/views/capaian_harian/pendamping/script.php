@@ -26,12 +26,12 @@
         });
 
         // 3. Event Ganti Pilihan Dropdown SWK
-        $('#pilih_swk').on('change', function(){
+        $('#pilih_swk, [name=pilih_swk]').on('change', function(){
             loadData();
         });
 
         // 4. Auto Load data pertama kali jika SWK sudah terpilih
-        if ($('#pilih_swk').val() !== '') {
+        if ($('#pilih_swk').val() || $('[name=pilih_swk]').val()) {
             loadData();
         }
     });
@@ -41,12 +41,8 @@
      */
     function loadData()
     {
-        var idswk = $('#pilih_swk').val();
-        var filter_bulan = $('#filter_bulan_tahun').val();
-
-        console.log("=== Request Filter ===");
-        console.log("ID SWK Terpilih:", idswk);
-        console.log("Periode:", filter_bulan);
+        var idswk = $('#pilih_swk').val() || $('[name=pilih_swk]').val();
+        var filter_bulan = $('#filter_bulan_tahun').val() || $('[name=filter_bulan_tahun]').val();
 
         if (!idswk) {
             Swal.fire('Peringatan', 'Silahkan pilih SWK terlebih dahulu.', 'warning');
@@ -65,7 +61,6 @@
                 $('#btnLoad').html('<i class="fa fa-spinner fa-spin"></i> Loading...').prop('disabled', true);
             },
             success: function(res){
-                console.log("Data Response:", res);
                 buildTable(res);
             },
             error: function(xhr){
@@ -83,14 +78,14 @@
      */
     function buildTable(res)
     {
-        var filter = $('#filter_bulan_tahun').val() || '';
+        var filter = $('#filter_bulan_tahun').val() || $('[name=filter_bulan_tahun]').val() || '';
         var pecah  = filter.split('-');
         var bulan  = pecah[0] ? pad(parseInt(pecah[0], 10)) : '01';
         var tahun  = pecah[1] || '<?= date("Y") ?>';
 
         // Reset Header & Baris
-        $('#headerOmset').html('<th width="150">Tanggal</th>');
-        $('#headerKunjungan').html('<th width="150">Tanggal</th>');
+        $('#headerOmset').html('<th style="min-width:150px;">Tanggal</th>');
+        $('#headerKunjungan').html('<th style="min-width:150px;">Tanggal</th>');
 
         $('#rowOmset').html('<td class="font-weight-bold text-left">Omset (Rp)</td>');
         $('#rowKunjungan').html('<td class="font-weight-bold text-left">Jumlah Kunjungan</td>');
@@ -99,7 +94,7 @@
         var totalOmset     = res.total_omset_harian || 0;
         var totalKunjungan = res.total_kunjungan_harian || 0;
 
-        $('#totalOmset').html(rupiah(totalOmset));
+        $('#totalOmset').html('Rp ' + rupiah(totalOmset));
         $('#totalKunjungan').html(parseInt(totalKunjungan, 10).toLocaleString('id-ID'));
 
         if (!res.jumlah_hari || res.jumlah_hari === 0) {
@@ -126,21 +121,23 @@
 
         // Render kolom tanggal 1 s/d jumlah hari
         for (var i = 1; i <= res.jumlah_hari; i++) {
-            var tanggalStr = tahun + '-' + bulan + '-' + pad(i);
-            var namaHari   = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-            var hari       = new Date(tanggalStr).getDay();
-            var bgClass    = (hari === 0) ? 'bg-danger text-white' : '';
+            var tglStr   = pad(i);
+            var tglFull  = tahun + '-' + bulan + '-' + tglStr;
+            var d        = new Date(parseInt(tahun, 10), parseInt(bulan, 10) - 1, i);
+            var hariIdx  = d.getDay();
+            var namaHari = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][hariIdx];
+            var bgClass  = (hariIdx === 0) ? 'bg-danger text-white' : '';
 
             // Header Kolom
-            $('#headerOmset').append('<td class="text-center ' + bgClass + '">' + namaHari[hari] + '<br>' + i + '</td>');
-            $('#headerKunjungan').append('<td class="text-center ' + bgClass + '">' + namaHari[hari] + '<br>' + i + '</td>');
+            $('#headerOmset').append('<th class="text-center ' + bgClass + '">' + namaHari + '<br>' + i + '</th>');
+            $('#headerKunjungan').append('<th class="text-center ' + bgClass + '">' + namaHari + '<br>' + i + '</th>');
 
             // Baris Data
             var valOmset     = (typeof mapOmset[i] !== 'undefined' && parseFloat(mapOmset[i]) > 0) ? rupiah(mapOmset[i]) : '-';
             var valKunjungan = (typeof mapKunjungan[i] !== 'undefined' && parseInt(mapKunjungan[i], 10) > 0) ? parseInt(mapKunjungan[i], 10).toLocaleString('id-ID') : '-';
 
-            $('#rowOmset').append('<td class="text-center ' + bgClass + '">' + valOmset + '</td>');
-            $('#rowKunjungan').append('<td class="text-center ' + bgClass + '">' + valKunjungan + '</td>');
+            $('#rowOmset').append('<td class="text-center cell-omset ' + bgClass + '" data-tanggal="' + tglFull + '">' + valOmset + '</td>');
+            $('#rowKunjungan').append('<td class="text-center cell-kunjungan ' + bgClass + '" data-tanggal="' + tglFull + '">' + valKunjungan + '</td>');
         }
     }
 
@@ -151,6 +148,9 @@
     function rupiah(angka) {
         angka = parseFloat(angka);
         if (isNaN(angka)) angka = 0;
-        return 'Rp ' + angka.toLocaleString('id-ID');
+        return angka.toLocaleString('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
     }
 </script>
