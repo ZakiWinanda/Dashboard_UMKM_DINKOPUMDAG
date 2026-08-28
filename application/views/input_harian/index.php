@@ -3,9 +3,7 @@
         <div class="container-fluid">
             <div class="row mb-2 align-items-center">
                 <div class="col-sm-7">
-                    <h1 class="font-weight-bold m-0" style="font-size:1.25rem;">
-                        <i class="fa fa-file-excel mr-2 text-success"></i>INPUT OMSET &amp; KUNJUNGAN HARIAN (EXCEL)
-                    </h1>
+                    <h3 class="font-weight-bold m-0"><?=$title;?></h3>
                 </div>
                 <div class="col-sm-5 text-right">
                     <span id="badgeTanggal" class="badge badge-primary px-3 py-2 mr-1" style="font-size:.8rem;display:none;"></span>

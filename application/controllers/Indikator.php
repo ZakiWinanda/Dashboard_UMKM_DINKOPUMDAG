@@ -16,7 +16,7 @@ class Indikator extends My_Controller {
 	{
 		$data['title'] = "INDIKATOR";
 		$this->load->view('header', $data);
-		$this->load->view('indikator');
+		$this->load->view('indikator'); 
 	}
 
 public function capaian_harian()

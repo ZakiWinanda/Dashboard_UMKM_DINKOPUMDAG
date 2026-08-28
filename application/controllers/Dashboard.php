@@ -14,7 +14,7 @@ class Dashboard extends MY_Controller {
     public function index()
     {
         $data = array(
-            'title' => 'Dashboard',
+            'title' => 'DASHBOARD',
             'tahun' => date('Y'),
             'bulan' => date('n')
         );

@@ -44,7 +44,7 @@
                             <input type="text" name="filter_bulan_tahun" id="filter_bulan_tahun" data-target="#filter_bulan_tahun" data-toggle="datetimepicker" placeholder="" class="form-control" value="<?=date('m-Y');?>" autocomplete="off" required>
                         </div>
                         <div class="col-md-2">
-                            <button type="button" id='btnLoad' class="col btn btn-primary btn-flat" title="filter"><i class="fa fa-paper-plane"></i> Submit bro</button>
+                            <button type="button" id='btnLoad' class="col btn btn-primary btn-flat" title="filter"><i class="fa fa-paper-plane"></i> Submit</button>
                         </div>
                     </div>
                 </form>

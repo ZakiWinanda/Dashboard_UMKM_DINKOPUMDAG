@@ -28,7 +28,7 @@ class Laporan extends My_Controller
 				$data['pendamping'] = $this->is_pimpinan || $this->is_admin ? $this->M_pengguna->get_pendamping() : '';
 			    $data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_pendamping($this->nip);
 
-				$data['title'] = 'Laporan';
+				$data['title'] = 'LAPORAN EVALUASI SWK';
 		        $this->load->view('header', $data);
 		        if(file_exists(APPPATH.'views/'.$view.'/index.php')){
 					$this->load->view($view.'/index', $data);

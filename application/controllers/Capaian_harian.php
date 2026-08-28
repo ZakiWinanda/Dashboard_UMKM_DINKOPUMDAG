@@ -26,7 +26,7 @@ class Capaian_harian extends MY_Controller
         // 2. Data pendukung ke view
         $data['nip']   = $nip;
         $data['role']  = $role;
-        $data['title'] = "OMSET & KUNJUNGAN HARIAN";
+        $data['title'] = "REKAP OMSET & KUNJUNGAN HARIAN";
 
         // 3. Load View sesuai Role
         $this->load->view('header', $data);

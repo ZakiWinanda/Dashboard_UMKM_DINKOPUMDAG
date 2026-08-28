@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="font-weight-bold m-0">REKAP OMSET & KUNJUNGAN HARIAN</h3>
+                    <h3 class="font-weight-bold m-0"><?=$title;?></h3>
                 </div>
             </div>
         </div>

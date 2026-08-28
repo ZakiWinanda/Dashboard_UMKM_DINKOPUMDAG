@@ -39,7 +39,7 @@ class Koordinator_pendamping extends My_Controller {
 		$data['pendamping'] = $this->is_pimpinan || $this->is_admin ? $this->M_pengguna->get_pendamping() : $this->M_koordinator_pendamping->get_by_koordinator($this->nip);
 		$data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_koordinator($this->nip);
 
-		$data['title'] = "OMSET & KUNJUNGAN HARIAN";
+		$data['title'] = "REKAP OMSET & KUNJUNGAN HARIAN";
 		$this->load->view('header', $data);
 		$this->load->view('capaian_harian/koordinator_pendamping/index');
 	}
@@ -64,7 +64,7 @@ class Koordinator_pendamping extends My_Controller {
 				$data['pendamping'] = $this->is_pimpinan || $this->is_admin ? $this->M_pengguna->get_pendamping() : $this->M_koordinator_pendamping->get_by_koordinator($this->nip);
 				$data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_koordinator($this->nip);
 
-				$data['title'] = 'Laporan';
+				$data['title'] = "LAPORAN EVALUASI IKI SWK";
 		        $this->load->view('header', $data);
 				$this->load->view('laporan/koordinator_pendamping/index', $data);
 		    }
