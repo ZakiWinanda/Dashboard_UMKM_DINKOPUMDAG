@@ -7,46 +7,28 @@ class M_capaian_harian extends CI_Model
     {
         $idswk = trim((string)$idswk);
 
-        $qDirect = $this->db
-            ->select('tanggal, omset')
-            ->where('idswk', $idswk)
-            ->where('MONTH(tanggal)', (int)$bulan, FALSE)
-            ->where('YEAR(tanggal)', (int)$tahun, FALSE)
-            ->get('t_omset_harian')
-            ->result();
-
-        $qUnit = $this->db
+        return $this->db
             ->select('tanggal, SUM(omset) AS omset', FALSE)
             ->where('idswk', $idswk)
             ->where('MONTH(tanggal)', (int)$bulan, FALSE)
             ->where('YEAR(tanggal)', (int)$tahun, FALSE)
             ->group_by('tanggal')
+            ->order_by('tanggal', 'ASC')
             ->get('t_omset_unit_usaha')
             ->result();
-
-        $map = [];
-        foreach ($qDirect as $r) {
-            $map[$r->tanggal] = (float)$r->omset;
-        }
-        foreach ($qUnit as $r) {
-            $map[$r->tanggal] = (float)$r->omset;
-        }
-
-        ksort($map);
-        $res = [];
-        foreach ($map as $tgl => $val) {
-            $res[] = (object)['tanggal' => $tgl, 'omset' => $val];
-        }
-        return $res;
     }
 
     public function getOmsetByTanggal($idswk, $tanggal)
     {
-        return $this->db
+        $q = $this->db
+            ->select('tanggal, SUM(omset) AS omset', FALSE)
             ->where('idswk', $idswk)
             ->where('tanggal', $tanggal)
-            ->get('t_omset_harian')
+            ->group_by('tanggal')
+            ->get('t_omset_unit_usaha')
             ->row();
+
+        return $q ? $q : (object)['tanggal' => $tanggal, 'omset' => 0];
     }
 
     public function saveOmset($data)
@@ -54,21 +36,31 @@ class M_capaian_harian extends CI_Model
         $cek = $this->db
             ->where('idswk', $data['idswk'])
             ->where('tanggal', $data['tanggal'])
-            ->get('t_omset_harian')
-            ->row();
+            ->get('t_omset_unit_usaha')
+            ->result();
 
-        if ($cek) {
-            $update = array(
-                'omset'      => $data['omset'],
-                'updated_at' => date('Y-m-d H:i:s')
-            );
-
-            $this->db
-                ->where('id', $cek->id)
-                ->update('t_omset_harian', $update);
-            return $cek->id;
+        if (!empty($cek)) {
+            $count = count($cek);
+            $portion = round((float)$data['omset'] / $count, 2);
+            foreach ($cek as $r) {
+                $this->db
+                    ->where('id', $r->id)
+                    ->update('t_omset_unit_usaha', [
+                        'omset'      => $portion,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+            }
+            return true;
         } else {
-            $this->db->insert('t_omset_harian', $data);
+            $insertData = [
+                'idswk'         => $data['idswk'],
+                'id_unit_usaha' => 'GENERAL',
+                'tanggal'       => $data['tanggal'],
+                'omset'         => $data['omset'],
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s')
+            ];
+            $this->db->insert('t_omset_unit_usaha', $insertData);
             return $this->db->insert_id();
         }
     }
@@ -77,46 +69,28 @@ class M_capaian_harian extends CI_Model
     {
         $idswk = trim((string)$idswk);
 
-        $qDirect = $this->db
-            ->select('tanggal, jumlah')
-            ->where('idswk', $idswk)
-            ->where('MONTH(tanggal)', (int)$bulan, FALSE)
-            ->where('YEAR(tanggal)', (int)$tahun, FALSE)
-            ->get('t_kunjungan_harian')
-            ->result();
-
-        $qUnit = $this->db
+        return $this->db
             ->select('tanggal, SUM(jumlah) AS jumlah', FALSE)
             ->where('idswk', $idswk)
             ->where('MONTH(tanggal)', (int)$bulan, FALSE)
             ->where('YEAR(tanggal)', (int)$tahun, FALSE)
             ->group_by('tanggal')
+            ->order_by('tanggal', 'ASC')
             ->get('t_kunjungan_unit_usaha')
             ->result();
-
-        $map = [];
-        foreach ($qDirect as $r) {
-            $map[$r->tanggal] = (int)$r->jumlah;
-        }
-        foreach ($qUnit as $r) {
-            $map[$r->tanggal] = (int)$r->jumlah;
-        }
-
-        ksort($map);
-        $res = [];
-        foreach ($map as $tgl => $val) {
-            $res[] = (object)['tanggal' => $tgl, 'jumlah' => $val];
-        }
-        return $res;
     }
 
     public function getKunjunganByTanggal($idswk, $tanggal)
     {
-        return $this->db
+        $q = $this->db
+            ->select('tanggal, SUM(jumlah) AS jumlah', FALSE)
             ->where('idswk', $idswk)
             ->where('tanggal', $tanggal)
-            ->get('t_kunjungan_harian')
+            ->group_by('tanggal')
+            ->get('t_kunjungan_unit_usaha')
             ->row();
+
+        return $q ? $q : (object)['tanggal' => $tanggal, 'jumlah' => 0];
     }
 
     public function saveKunjungan($data)
@@ -124,27 +98,37 @@ class M_capaian_harian extends CI_Model
         $cek = $this->db
             ->where('idswk', $data['idswk'])
             ->where('tanggal', $data['tanggal'])
-            ->get('t_kunjungan_harian')
-            ->row();
+            ->get('t_kunjungan_unit_usaha')
+            ->result();
 
-        if ($cek) {
-            $update = array(
-                'jumlah'     => $data['jumlah'],
-                'updated_at' => date('Y-m-d H:i:s')
-            );
-
-            $this->db
-                ->where('id', $cek->id)
-                ->update('t_kunjungan_harian', $update);
-            return $cek->id;
+        if (!empty($cek)) {
+            $count = count($cek);
+            $portion = max(1, (int)floor((int)$data['jumlah'] / $count));
+            foreach ($cek as $r) {
+                $this->db
+                    ->where('id', $r->id)
+                    ->update('t_kunjungan_unit_usaha', [
+                        'jumlah'     => $portion,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+            }
+            return true;
         } else {
-            $this->db->insert('t_kunjungan_harian', $data);
+            $insertData = [
+                'idswk'         => $data['idswk'],
+                'id_unit_usaha' => 'GENERAL',
+                'tanggal'       => $data['tanggal'],
+                'jumlah'        => $data['jumlah'],
+                'created_at'    => date('Y-m-d H:i:s'),
+                'updated_at'    => date('Y-m-d H:i:s')
+            ];
+            $this->db->insert('t_kunjungan_unit_usaha', $insertData);
             return $this->db->insert_id();
         }
     }
 
     /**
-     * Hitung total omset bulanan dari t_omset_harian
+     * Hitung total omset bulanan murni dari t_omset_unit_usaha
      */
     public function totalOmsetBulanan($idswk, $bulan, $tahun)
     {
@@ -152,15 +136,8 @@ class M_capaian_harian extends CI_Model
         $this->db->where('idswk', $idswk);
         $this->db->where('MONTH(tanggal)', (int)$bulan, FALSE);
         $this->db->where('YEAR(tanggal)', (int)$tahun, FALSE);
-        $q1 = (float)($this->db->get('t_omset_harian')->row()->omset ?? 0);
-
-        $this->db->select_sum('omset');
-        $this->db->where('idswk', $idswk);
-        $this->db->where('MONTH(tanggal)', (int)$bulan, FALSE);
-        $this->db->where('YEAR(tanggal)', (int)$tahun, FALSE);
-        $q2 = (float)($this->db->get('t_omset_unit_usaha')->row()->omset ?? 0);
-
-        return max($q1, $q2);
+        $q = $this->db->get('t_omset_unit_usaha')->row();
+        return (float)($q->omset ?? 0);
     }
 
     public function totalKunjunganBulanan($idswk, $bulan, $tahun)
@@ -169,15 +146,8 @@ class M_capaian_harian extends CI_Model
         $this->db->where('idswk', $idswk);
         $this->db->where('MONTH(tanggal)', (int)$bulan, FALSE);
         $this->db->where('YEAR(tanggal)', (int)$tahun, FALSE);
-        $q1 = (int)($this->db->get('t_kunjungan_harian')->row()->jumlah ?? 0);
-
-        $this->db->select_sum('jumlah');
-        $this->db->where('idswk', $idswk);
-        $this->db->where('MONTH(tanggal)', (int)$bulan, FALSE);
-        $this->db->where('YEAR(tanggal)', (int)$tahun, FALSE);
-        $q2 = (int)($this->db->get('t_kunjungan_unit_usaha')->row()->jumlah ?? 0);
-
-        return max($q1, $q2);
+        $q = $this->db->get('t_kunjungan_unit_usaha')->row();
+        return (int)($q->jumlah ?? 0);
     }
 
     public function omsetArray($idswk, $bulan, $tahun)

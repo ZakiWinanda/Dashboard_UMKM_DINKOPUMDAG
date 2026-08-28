@@ -1,21 +1,10 @@
 <script type="text/javascript">
     var totalOmset = 0;
     var totalKunjungan = 0;
-
-    $(document).ready(function(){
-        $('#btnLoad').click(function(e){
-            e.preventDefault();
+    $(function(){
+        $('#btnLoad').click(function(){
             loadData();
         });
-
-        $(document).on('change', '#pilih_swk, [name=pilih_swk]', function(){
-            loadData();
-        });
-
-        // Auto Load data pertama kali jika SWK sudah terpilih
-        if ($('#pilih_swk').val() || $('[name=pilih_swk]').val()) {
-            loadData();
-        }
     });
 
     $('#idpendamping').change(function(){
@@ -40,13 +29,9 @@
             success:function(res){
                 var html = '<option value="">- Pilih SWK -</option>';
                 $.each(res,function(i,row){
-                    var valId = row.idswk || row.id;
-                    html += '<option value="'+valId+'">'+row.nama_swk+'</option>';
+                    html += '<option value="'+row.idswk+'">'+row.nama_swk+'</option>';
                 });
                 $('#pilih_swk').html(html);
-                if ($.fn.select2) {
-                    $('#pilih_swk').trigger('change.select2');
-                }
             }
         });
     });
@@ -73,16 +58,13 @@
 
     function loadData()
     {
-        var idswk = $('#pilih_swk').val() || $('[name=pilih_swk]').val();
-        var filter_bulan = $('#filter_bulan_tahun').val() || $('[name=filter_bulan_tahun]').val();
-
-        if(!idswk)
+        if($('[name=pilih_swk]').val()=='')
         {
             Swal.fire(
                 'Peringatan',
                 'Silahkan pilih SWK.',
                 'warning'
-            );
+                );
             return;
         }
 
@@ -91,8 +73,8 @@
             type : "POST",
             dataType : "json",
             data : {
-                idswk : idswk,
-                filter_bulan_tahun : filter_bulan
+                idswk : $('[name=pilih_swk]').val(),
+                filter_bulan_tahun : $('[name=filter_bulan_tahun]').val()
             },
             beforeSend:function(){
                 $('#btnLoad')
@@ -112,84 +94,94 @@
 
     function buildTable(res)
     {
-        var filter = $('#filter_bulan_tahun').val() || $('[name=filter_bulan_tahun]').val() || '';
-        var pecah  = filter.split('-');
-        var bulan  = pecah[0] ? pad(parseInt(pecah[0], 10)) : '01';
-        var tahun  = pecah[1] || '<?= date("Y") ?>';
+        var filter = $('[name=filter_bulan_tahun]').val();
+        var pecah = filter.split('-');
 
-        $('#headerOmset').html('<th style="min-width:150px;">Tanggal</th>');
-        $('#headerKunjungan').html('<th style="min-width:150px;">Tanggal</th>');
+        var bulan = pecah[0];
+        var tahun = pecah[1];
 
-        $('#rowOmset').html('<td class="font-weight-bold text-left">Omset (Rp)</td>');
-        $('#rowKunjungan').html('<td class="font-weight-bold text-left">Jumlah Kunjungan</td>');
+        $('#headerOmset').html('<th width="180">Tanggal</th>');
+        $('#headerKunjungan').html('<th width="180">Tanggal</th>');
 
-        totalOmset = res.total_omset_harian || 0;
-        totalKunjungan = res.total_kunjungan_harian || 0;
+        $('#rowOmset').html('<th>Omset</th>');
+        $('#rowKunjungan').html('<th>Kunjungan</th>');
 
-        $('#totalOmset').html('Rp ' + rupiah(totalOmset));
-        $('#totalKunjungan').html(parseInt(totalKunjungan, 10).toLocaleString('id-ID'));
+        totalOmset = res.total_omset_harian;
+        totalKunjungan = res.total_kunjungan_harian;
 
-        if (!res.jumlah_hari || res.jumlah_hari === 0) {
-            return;
-        }
+        $('#totalOmset').html(rupiah(totalOmset));
+        $('#totalKunjungan').html(totalKunjungan);
 
         var omset = {};
         var kunjungan = {};
+        $.each(res.omset,function(i,e){
+            var tgl = parseInt(e.tanggal.substr(8,2));
+            omset[tgl]=e.omset;
+        });
 
-        if (res.omset && res.omset.length > 0) {
-            $.each(res.omset, function(i, e){
-                var tgl = parseInt(e.tanggal.substr(8, 2), 10);
-                omset[tgl] = e.omset;
-            });
-        }
+        $.each(res.kunjungan,function(i,e){
+            var tgl = parseInt(e.tanggal.substr(8,2));
+            kunjungan[tgl]=e.jumlah;
+        });
 
-        if (res.kunjungan && res.kunjungan.length > 0) {
-            $.each(res.kunjungan, function(i, e){
-                var tgl = parseInt(e.tanggal.substr(8, 2), 10);
-                kunjungan[tgl] = e.jumlah;
-            });
-        }
+        for(var i=1;i<=res.jumlah_hari;i++)
+        {
+            var tanggal = tahun+'-'+bulan+'-'+pad(i);
 
-        for (var i = 1; i <= res.jumlah_hari; i++) {
-            var tglStr  = pad(i);
-            var tglFull = tahun + '-' + bulan + '-' + tglStr;
-            var d       = new Date(parseInt(tahun, 10), parseInt(bulan, 10) - 1, i);
-            var hariIdx = d.getDay();
-            var namaHari = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][hariIdx];
+            var namaHari = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+            var hari = new Date(tanggal).getDay();
 
-            var bgClass = (hariIdx === 0) ? 'bg-danger text-white' : '';
+            var bgClass = (hari == 0) ? 'bg-fuchsia' : '';
 
-            $('#headerOmset').append('<th class="text-center ' + bgClass + '">' + namaHari + '<br>' + i + '</th>');
-            $('#headerKunjungan').append('<th class="text-center ' + bgClass + '">' + namaHari + '<br>' + i + '</th>');
+            $('#headerOmset').append(
+                '<td class="text-center '+bgClass+'">'+namaHari[hari]+'<br>'+i+'</td>'
+                );
 
-            var valOmset     = (typeof omset[i] !== 'undefined' && parseFloat(omset[i]) > 0) ? rupiah(omset[i]) : '-';
-            var valKunjungan = (typeof kunjungan[i] !== 'undefined' && parseInt(kunjungan[i], 10) > 0) ? parseInt(kunjungan[i], 10).toLocaleString('id-ID') : '-';
+            $('#headerKunjungan').append(
+                '<td class="text-center '+bgClass+'">'+namaHari[hari]+'<br>'+i+'</td>'
+                );
+
+            var nilaiOmset='';
+            if(typeof omset[i] !== 'undefined')
+                nilaiOmset = rupiah(omset[i]);
+
+            var nilaiKunjungan='';
+            if(typeof kunjungan[i] !== 'undefined')
+                nilaiKunjungan = kunjungan[i];
 
             $('#rowOmset').append(
-                '<td class="text-center cell-omset ' + bgClass + '" data-tanggal="' + tglFull + '" style="cursor:pointer">' +
-                valOmset +
+                '<td class="text-center cell-omset '+bgClass+'" '+
+                'data-tanggal="'+tanggal+'" '+
+                'style="cursor:pointer">'+
+                nilaiOmset+
                 '</td>'
-            );
+                );
 
             $('#rowKunjungan').append(
-                '<td class="text-center cell-kunjungan ' + bgClass + '" data-tanggal="' + tglFull + '" style="cursor:pointer">' +
-                valKunjungan +
+                '<td class="text-center cell-kunjungan '+bgClass+'" '+
+                'data-tanggal="'+tanggal+'" '+
+                'style="cursor:pointer">'+
+                nilaiKunjungan+
                 '</td>'
-            );
+                );
         }
     }
 
     function pad(n) {
-        return n < 10 ? '0' + n : n;
+        return n<10 ? '0'+n : n;
     }
 
     function rupiah(angka) {
         angka = parseFloat(angka);
-        if (isNaN(angka)) angka = 0;
-        return angka.toLocaleString('id-ID', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        });
+        if(isNaN(angka))
+            angka = 0;
+
+        return angka.toLocaleString('id-ID',
+        {
+            minimumFractionDigits:0,
+            maximumFractionDigits:0
+        }
+        );
     }
 
     $(document).on('click','.cell-omset',function(){
@@ -197,7 +189,7 @@
         $('#modalOmset').modal('show');
         $('#omsetTanggal').val($(this).data('tanggal'));
         $('#tanggalOmsetText').val(formatTanggalIndonesia(tanggal));
-        $('#omsetSwk').val($('#pilih_swk').val() || $('[name=pilih_swk]').val());
+        $('#omsetSwk').val($('[name=pilih_swk]').val());
 
         var nilai = $(this).text().replace(/[^\d]/g,'');
         $('#nilaiOmset').val(nilai=='' ? 0 : nilai);
@@ -208,7 +200,7 @@
         $('#modalKunjungan').modal('show');
         $('#kunjunganTanggal').val($(this).data('tanggal'));
         $('#tanggalKunjunganText').val(formatTanggalIndonesia(tanggal));
-        $('#kunjunganSwk').val($('#pilih_swk').val() || $('[name=pilih_swk]').val());
+        $('#kunjunganSwk').val($('[name=pilih_swk]').val());
 
         var jml = $.trim($(this).text());
         $('#jumlahKunjungan').val(jml=='' ? 0 : jml);
@@ -219,13 +211,9 @@
         return p[2]+'-'+p[1]+'-'+p[0];
     }
 
-    try {
-        if ($.fn.datetimepicker) {
-            $('#filter_bulan_tahun').datetimepicker({
-                showClose: true,
-                showTime: true,
-                format: 'MM-YYYY',
-            });
-        }
-    } catch(e){}
+    $('#filter_bulan_tahun').datetimepicker({
+        showClose: true,
+        showTime: true,
+        format: 'MM-YYYY',
+    });
 </script>
