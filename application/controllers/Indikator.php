@@ -29,7 +29,20 @@ public function capaian_harian()
     $view = 'indikator/'.$this->role;
 
     $data['pendamping'] = $this->is_pimpinan || $this->is_admin ? $this->M_pengguna->get_pendamping() : '';
-    $data['swk'] = $this->is_pimpinan || $this->is_admin  ? $this->M_swk->get_all() : $this->M_swk->get_by_pendamping($this->nip);
+
+    if (!empty($this->is_pendamping_kecamatan)) {
+      $this->load->model('M_kecamatan');
+      $raw_kec = $this->M_kecamatan->get_kecamatan_by_user($this->nip, $this->role);
+      $data['swk'] = array_map(function($k) {
+        $nama = is_object($k) ? $k->nama_kecamatan : ($k['nama_kecamatan'] ?? $k);
+        return (object)[
+          'idswk'    => $nama,
+          'nama_swk' => $nama
+        ];
+      }, $raw_kec);
+    } else {
+      $data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_pendamping($this->nip);
+    }
 
 	$data['title'] = "ENTRI CAPAIAN INDIKATOR";
     $this->load->view('header', $data);

@@ -99,7 +99,7 @@
                 <img src="<?=base_url();?>assets/img/logo_pemkot.png" class="logo-xs mr-2 ml-2" style="max-height: 48px;">
                 <div class="pl-3 pr-3">
                     <img src="<?=base_url();?>assets/img/logo_pemkot.png" class="brand-text" style="max-height: 48px;">
-                    <span>Monev <strong>SWK</strong></span>
+                    <span>Monev</span>
                 </div>
             </a>
 
@@ -114,22 +114,36 @@
                         </li>
 
                         <?php if (empty($is_pimpinan)): ?>
-                        <li class="nav-header">MENU PENDAMPING</li>
+                        <li class="nav-header">MENU</li>
                         <li class="nav-item">
+                            <?php if (!empty($is_pendamping_kecamatan)): ?>
+                            <a href="<?=base_url('input_bulanan');?>" class="nav-link <?php if($uri1=='input_bulanan' || $uri1=='input_harian') echo('active');?>">
+                                <i class="nav-icon fa fa-edit"></i>
+                                <p>INPUT OMSET & KUNJUNGAN</p>
+                            </a>
+                            <?php else: ?>
                             <a href="<?=base_url('input_harian');?>" class="nav-link <?php if($uri1=='input_harian') echo('active');?>">
                                 <i class="nav-icon fa fa-edit"></i>
                                 <p>INPUT OMSET & KUNJUNGAN</p>
                             </a>
+                            <?php endif; ?>
                         </li>
                         <li class="nav-item">
-                            <a href="<?=base_url('capaian_harian');?>" class="nav-link <?php if($uri1=='capaian_harian') echo('active');?>">
-                                <i class="nav-icon fa fa-edit"></i>
+                            <?php if (!empty($is_pendamping_kecamatan)): ?>
+                            <a href="<?=base_url('capaian_bulanan');?>" class="nav-link <?php if($uri1=='capaian_bulanan' || $uri1=='capaian_harian') echo('active');?>">
+                                <i class="nav-icon fa fa-chart-line"></i>
                                 <p>REKAP OMSET & KUNJUNGAN</p>
                             </a>
+                            <?php else: ?>
+                            <a href="<?=base_url('capaian_harian');?>" class="nav-link <?php if($uri1=='capaian_harian') echo('active');?>">
+                                <i class="nav-icon fa fa-chart-line"></i>
+                                <p>REKAP OMSET & KUNJUNGAN</p>
+                            </a>
+                            <?php endif; ?>
                         </li>
                         <li class="nav-item">
                             <a href="<?=base_url('indikator/entri');?>" class="nav-link <?php if($uri1=='indikator') echo('active');?>">
-                                <i class="nav-icon fa fa-edit"></i>
+                                <i class="nav-icon fa fa-tasks"></i>
                                 <p>ENTRI CAPAIAN INDIKATOR</p>
                             </a>
                         </li>

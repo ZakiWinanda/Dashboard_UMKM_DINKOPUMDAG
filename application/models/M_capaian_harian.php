@@ -18,6 +18,34 @@ class M_capaian_harian extends CI_Model
             ->result();
     }
 
+    public function getOmsetBulanan($idswk, $tahun)
+    {
+        $idswk = trim((string)$idswk);
+
+        return $this->db
+            ->select('MONTH(tanggal) AS bulan, SUM(omset) AS omset', FALSE)
+            ->where('idswk', $idswk)
+            ->where('YEAR(tanggal)', (int)$tahun, FALSE)
+            ->group_by('MONTH(tanggal)')
+            ->order_by('MONTH(tanggal)', 'ASC')
+            ->get('t_omset_unit_usaha')
+            ->result();
+    }
+
+    public function getKunjunganBulanan($idswk, $tahun)
+    {
+        $idswk = trim((string)$idswk);
+
+        return $this->db
+            ->select('MONTH(tanggal) AS bulan, SUM(jumlah) AS jumlah', FALSE)
+            ->where('idswk', $idswk)
+            ->where('YEAR(tanggal)', (int)$tahun, FALSE)
+            ->group_by('MONTH(tanggal)')
+            ->order_by('MONTH(tanggal)', 'ASC')
+            ->get('t_kunjungan_unit_usaha')
+            ->result();
+    }
+
     public function getOmsetByTanggal($idswk, $tanggal)
     {
         $q = $this->db

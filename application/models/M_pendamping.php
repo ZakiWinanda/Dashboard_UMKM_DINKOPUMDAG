@@ -17,10 +17,16 @@ private function _get_datatables_query()
         u.no_tlp,
         COUNT(DISTINCT ps.idswk) AS jumlah_swk,
         GROUP_CONCAT(
-            s.nama_swk
+            DISTINCT s.nama_swk
             ORDER BY s.nama_swk
             SEPARATOR '<br>'
-        ) AS daftar_swk
+        ) AS daftar_swk,
+        COUNT(DISTINCT pk.nama_kecamatan) AS jumlah_kecamatan,
+        GROUP_CONCAT(
+            DISTINCT pk.nama_kecamatan
+            ORDER BY pk.nama_kecamatan
+            SEPARATOR '<br>'
+        ) AS daftar_kecamatan
     ", FALSE);
 
     $this->db->from('m_users u');
@@ -34,6 +40,12 @@ private function _get_datatables_query()
     $this->db->join(
         'm_swk s',
         's.idswk = ps.idswk',
+        'left'
+    );
+
+    $this->db->join(
+        'pendamping_kecamatan pk',
+        'pk.nip = u.nik',
         'left'
     );
 

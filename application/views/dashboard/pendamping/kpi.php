@@ -3,10 +3,10 @@
 		<div class="small-box bg-info">
 			<div class="inner">
 				<h3 id="total_swk">0</h3>
-				<p>SWK</p>
+				<p id="label_total_wilayah"><?= !empty($is_pendamping_kecamatan) ? 'Kecamatan' : 'SWK' ?></p>
 			</div>
 			<div class="icon">
-				<i class="fas fa-store"></i>
+				<i id="icon_total_wilayah" class="fas <?= !empty($is_pendamping_kecamatan) ? 'fa-map-marker-alt' : 'fa-store' ?>"></i>
 			</div>
 		</div>
 	</div>

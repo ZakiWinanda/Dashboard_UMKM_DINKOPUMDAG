@@ -3,6 +3,58 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_dashboard_petugas extends CI_Model
 {
+public function isPendampingKecamatan($nip = '')
+{
+    if (empty($nip)) return false;
+    $has_swk = $this->db
+        ->where('nip', $nip)
+        ->count_all_results('pendamping_swk') > 0;
+    return !$has_swk;
+}
+
+public function totalWilayah($nip = '')
+{
+    if (!empty($nip) && $this->isPendampingKecamatan($nip)) {
+        return (int)$this->db
+            ->where('nip', $nip)
+            ->count_all_results('pendamping_kecamatan');
+    }
+
+    return $this->totalSwk($nip);
+}
+
+public function daftarWilayah($nip = '', $tahun, $bulan)
+{
+    if (!empty($nip) && $this->isPendampingKecamatan($nip)) {
+        return $this->daftarKecamatan($nip, $tahun, $bulan);
+    }
+
+    return $this->daftarSwk($nip, $tahun, $bulan);
+}
+
+public function daftarKecamatan($nip = '', $tahun, $bulan)
+{
+    $this->db->select("
+        pk.nama_kecamatan,
+        pk.nama_kecamatan AS nama_swk,
+        pk.nama_kecamatan AS idswk,
+        '-' AS stan,
+        '-' AS alamat,
+        u.nama_lengkap AS nama_pendamping,
+        0 AS status,
+        0 AS persentase
+    ", FALSE);
+    $this->db->from('pendamping_kecamatan pk');
+    $this->db->join('m_users u', 'u.nik = pk.nip', 'left');
+
+    if (!empty($nip)) {
+        $this->db->where('pk.nip', $nip);
+    }
+
+    $this->db->order_by('pk.nama_kecamatan', 'ASC');
+    return $this->db->get()->result();
+}
+
 public function totalSwk($nip = '')
 {
     $this->db->from('m_swk s');

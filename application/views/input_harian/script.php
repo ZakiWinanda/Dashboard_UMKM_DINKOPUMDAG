@@ -273,6 +273,9 @@ function fmtTgl(y, m, d) { return y + '-' + String(m).padStart(2,'0') + '-' + St
 function fmtTglHuman(tgl) {
     if (!tgl) return '';
     var p = tgl.split('-');
+    if (p.length === 2) {
+        return NAMA_BULAN[parseInt(p[1],10)-1] + ' ' + p[0];
+    }
     return parseInt(p[2],10) + ' ' + NAMA_BULAN[parseInt(p[1],10)-1] + ' ' + p[0];
 }
 function getToday() { var n = new Date(); return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0'); }

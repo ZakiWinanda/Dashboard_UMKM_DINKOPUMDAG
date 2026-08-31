@@ -389,6 +389,26 @@ INSERT INTO `m_users` (`nik`, `pass`, `nama_lengkap`, `aktif`, `role`, `jabatan`
 ('199610172025212060', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'DYAH TANTRI, ST', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '081234981533'),
 ('199612082025212088', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'RIZKI ADEVIANA, S.Pd.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '089517561534'),
 ('199708192025212066', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'NOVITA DWI AGUSTINA, SM', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-07-01 23:05:09', '085335009591'),
+('198906062025212106', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Wahyu Atria Wulansari', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199006012025212085', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Nurul Qomariyah, S.Sos., M.K.P.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199002032025212065', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Nurul Hidayah Purnamasari, S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199208252025212091', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Ika Marlina, S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199101192025211095', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Moh. Kapit Basir, A.Md.Tk.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198808192025211063', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Bagus Pranata, S.I.A., S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199309212025212067', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Rakhmadian Sari, S.Ian.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199011172025211053', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Muchamad Rizki, S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199505192025212078', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Pitta Annisa Triana, S.Ak.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198205032025211122', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Ferry Triantoro, S.E.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198208032025211059', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Abdul Wajis, S.H.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199205102025211164', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Tri Garnis Sankar, S.T.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198702092025211047', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Burhan Fuady, S.Pd.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199504192025211054', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Faris Eka Dirmantara, S.M.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198903162025212102', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Marta Lidia Wati, S.Pd.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199210222025211070', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Mochamad Andi Widayanto, A.Md.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199710232025212061', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Nur Widadul Athiyyah', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('197708222025212012', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Heny Budi Rahmawati, S.I.P.', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('199111292025211069', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Teguh Noviansah', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
+('198906122025212094', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'Titik', 1, 'pendamping', NULL, NULL, NULL, NULL, '2026-08-31 13:30:00', NULL),
 ('admin', '$2y$10$JmnCo3c15omWy4t0YbULDOyhvlE7YwJfQcBt4yo81/m5HLu6JnsNK', 'ADMINISTRATOR', 1, 'administrator', NULL, NULL, NULL, NULL, '2026-07-17 13:11:24', NULL);
 
 -- --------------------------------------------------------
@@ -464,6 +484,57 @@ INSERT INTO `pendamping_swk` (`nip`, `idswk`) VALUES
 ('199204072025212115', 'f5eab644-0fb9-4a7e-bda6-128d73d1ee1b'),
 ('199204072025212115', 'f6265a8f-0162-4184-9b63-dd8f90c54459'),
 ('199612082025212088', 'f6265a8f-0162-4184-9b63-dd8f90c54459');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pendamping_kecamatan`
+--
+
+DROP TABLE IF EXISTS `pendamping_kecamatan`;
+CREATE TABLE IF NOT EXISTS `pendamping_kecamatan` (
+  `nip` char(30) NOT NULL,
+  `nama_kecamatan` varchar(100) NOT NULL,
+  PRIMARY KEY (`nip`,`nama_kecamatan`),
+  KEY `nip` (`nip`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `pendamping_kecamatan`
+--
+
+INSERT INTO `pendamping_kecamatan` (`nip`, `nama_kecamatan`) VALUES
+('198906062025212106', 'ASEM ROWO'),
+('199006012025212085', 'BENOWO'),
+('199002032025212065', 'BUBUTAN'),
+('199002032025212065', 'SUKOMANUNGGAL'),
+('199208252025212091', 'BULAK'),
+('199208252025212091', 'KENJERAN'),
+('199101192025211095', 'DUKUH PAKIS'),
+('199101192025211095', 'WONOCOLO'),
+('198808192025211063', 'GAYUNGAN'),
+('198808192025211063', 'JAMBANGAN'),
+('199309212025212067', 'GENTENG'),
+('199011172025211053', 'GUBENG'),
+('199011172025211053', 'RUNGKUT'),
+('199505192025212078', 'GUNUNG ANYAR'),
+('199505192025212078', 'PABEAN CANTIAN'),
+('198205032025211122', 'KARANG PILANG'),
+('198205032025211122', 'WIYUNG'),
+('198208032025211059', 'KREMBANGAN'),
+('198208032025211059', 'WONOKROMO'),
+('199205102025211164', 'LAKARSANTRI'),
+('199205102025211164', 'TANDES'),
+('198702092025211047', 'MULYOREJO'),
+('198702092025211047', 'SUKOLILO'),
+('199504192025211054', 'PAKAL'),
+('199504192025211054', 'SAMBIKEREP'),
+('198903162025212102', 'SAWAHAN'),
+('198903162025212102', 'SIMOKERTO'),
+('199210222025211070', 'SEMAMPIR'),
+('199210222025211070', 'TAMBAKSARI'),
+('199710232025212061', 'TEGALSARI'),
+('197708222025212012', 'TENGGILIS MEJOYO');
 
 -- --------------------------------------------------------
 

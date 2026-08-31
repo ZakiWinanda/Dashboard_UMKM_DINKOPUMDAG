@@ -401,20 +401,34 @@ class Data_master extends My_Controller {
         $data = array();
         foreach ($list as $row) {
             $no++;
-            $nik         = html_escape($row->nik);
-            $nama        = html_escape($row->nama_lengkap);
-            $no_tlp      = html_escape($row->no_tlp);
-            $jumlah_swk  = (int)$row->jumlah_swk;
-            $daftar_swk  = !empty($row->daftar_swk) ? htmlspecialchars_decode($row->daftar_swk) : '-';
+            $nik              = html_escape($row->nik);
+            $nama             = html_escape($row->nama_lengkap);
+            $no_tlp           = html_escape($row->no_tlp);
+            $jumlah_swk       = (int)$row->jumlah_swk;
+            $daftar_swk       = !empty($row->daftar_swk) ? htmlspecialchars_decode($row->daftar_swk) : '';
+            $daftar_kecamatan = !empty($row->daftar_kecamatan) ? htmlspecialchars_decode($row->daftar_kecamatan) : '';
+
+            // Jika NIP terdeteksi memiliki SWK -> Pendamping SWK (kolom menampilkan daftar SWK)
+            // Jika NIP TIDAK terdeteksi memiliki SWK -> Pendamping Kecamatan (kolom menampilkan daftar Kecamatan)
+            if ($jumlah_swk > 0) {
+                $jenis_badge = '<span class="badge badge-info"><i class="fa fa-store"></i> Pendamping SWK</span>';
+                $wilayah     = !empty($daftar_swk) ? $daftar_swk : '<span class="text-muted">Belum ada SWK</span>';
+                $tipe        = 'swk';
+            } else {
+                $jenis_badge = '<span class="badge badge-success"><i class="fa fa-map-marker-alt"></i> Pendamping Kecamatan</span>';
+                $wilayah     = !empty($daftar_kecamatan) ? $daftar_kecamatan : '<span class="text-muted">Belum ada Kecamatan</span>';
+                $tipe        = 'kecamatan';
+            }
 
             $data[] = array(
-                'no'         => $no,
-                'nip'        => $nik,
-                'nama'       => $nama,
-                'jumlah_swk' => $jumlah_swk,
-                'no_tlp'     => $no_tlp,
-                'swk'        => $daftar_swk,
-                'aksi'       => '
+                'no'               => $no,
+                'nip'              => $nik,
+                'nama'             => $nama,
+                'no_tlp'           => $no_tlp,
+                'jenis_pendamping' => $jenis_badge,
+                'tipe'             => $tipe,
+                'penugasan'        => $wilayah,
+                'aksi'             => '
                 <button type="button" class="btn btn-success btn-flat btn-sm mb-1" onclick="edit(\''.$nik.'\')"> <i class="fa fa-edit"></i> Edit</button>
                 <button type="button" class="btn btn-danger btn-flat btn-sm mb-1" onclick="hapus(\''.$nik.'\', \''.$nama.'\')"><i class="fa fa-trash"></i> Hapus</button>
                 '
@@ -439,18 +453,20 @@ class Data_master extends My_Controller {
             show_404();
         }
 
-        $mode = $this->input->post('mode');
-        $nip   = trim($this->input->post('nip', TRUE));
-        $idswk = $this->input->post('idswk');
+        $mode      = $this->input->post('mode');
+        $nip       = trim($this->input->post('nip', TRUE));
+        $idswk     = $this->input->post('idswk');
+        $kecamatan = $this->input->post('kecamatan');
 
-        if($mode=='edit') $this->_edit_pendamping($nip,$idswk);
-        elseif($mode=='tambah') $this->_tambah_pendamping($nip,$idswk);
+        if($mode=='edit') $this->_edit_pendamping($nip,$idswk,$kecamatan);
+        elseif($mode=='tambah') $this->_tambah_pendamping($nip,$idswk,$kecamatan);
     }
 
-    public function _tambah_pendamping()
+    public function _tambah_pendamping($nip_param = '', $idswk_param = null, $kecamatan_param = null)
     {
-        $nip   = $this->input->post('pilih_nip');
-        $idswk = $this->input->post('idswk');
+        $nip       = $this->input->post('pilih_nip') ?: $nip_param;
+        $idswk     = $this->input->post('idswk') ?: $idswk_param;
+        $kecamatan = $this->input->post('kecamatan') ?: $kecamatan_param;
 
         if (empty($nip)) {
             echo json_encode(array(
@@ -460,32 +476,31 @@ class Data_master extends My_Controller {
             return;
         }
 
-        if (empty($idswk) || !is_array($idswk)) {
+        if (empty($idswk) && empty($kecamatan)) {
             echo json_encode(array(
                 'status'  => FALSE,
-                'message' => 'Minimal pilih satu SWK.'
-            ));
-            return;
-        }
-
-        $cek = $this->db
-        ->where('nip', $nip)
-        ->count_all_results('pendamping_swk');
-
-        if ($cek > 0) {
-            echo json_encode(array(
-                'status'  => FALSE,
-                'message' => 'Pendamping sudah terdaftar.'
+                'message' => 'Minimal pilih satu SWK atau Kecamatan.'
             ));
             return;
         }
 
         $this->db->trans_begin();
-        foreach ($idswk as $id) {
-            $this->db->insert('pendamping_swk', array(
-                'nip'   => $nip,
-                'idswk' => $id
-            ));
+        if (!empty($idswk) && is_array($idswk)) {
+            foreach ($idswk as $id) {
+                $this->db->insert('pendamping_swk', array(
+                    'nip'   => $nip,
+                    'idswk' => $id
+                ));
+            }
+        }
+
+        if (!empty($kecamatan) && is_array($kecamatan)) {
+            foreach ($kecamatan as $k) {
+                $this->db->insert('pendamping_kecamatan', array(
+                    'nip'            => $nip,
+                    'nama_kecamatan' => $k
+                ));
+            }
         }
 
         if ($this->db->trans_status() === TRUE) {
@@ -506,7 +521,7 @@ class Data_master extends My_Controller {
         }
     }
 
-    function _edit_pendamping($nip, $idswk)
+    function _edit_pendamping($nip, $idswk = null, $kecamatan = null)
     {
         if (empty($nip)) {
             echo json_encode(array(
@@ -524,6 +539,17 @@ class Data_master extends My_Controller {
                 $this->db->insert('pendamping_swk',array(
                     'nip'=>$nip,
                     'idswk'=>$id
+                ));
+            }
+        }
+
+        $this->db->where('nip',$nip);
+        $this->db->delete('pendamping_kecamatan');
+        if(is_array($kecamatan)) {
+            foreach($kecamatan as $k) {
+                $this->db->insert('pendamping_kecamatan',array(
+                    'nip'=>$nip,
+                    'nama_kecamatan'=>$k
                 ));
             }
         }
@@ -563,16 +589,29 @@ class Data_master extends My_Controller {
         ->result();
 
         $idswk = array();
-
         foreach($rows as $r)
         {
             $idswk[] = $r->idswk;
         }
 
+        $rows_kec = $this->db
+        ->select('nama_kecamatan')
+        ->from('pendamping_kecamatan')
+        ->where('nip', $nip)
+        ->get()
+        ->result();
+
+        $kecamatan = array();
+        foreach($rows_kec as $rk)
+        {
+            $kecamatan[] = $rk->nama_kecamatan;
+        }
+
         echo json_encode(array(
-            'status' => TRUE,
-            'nip'    => $nip,
-            'idswk'  => $idswk
+            'status'    => TRUE,
+            'nip'       => $nip,
+            'idswk'     => $idswk,
+            'kecamatan' => $kecamatan
         ));
     }
 
@@ -595,12 +634,15 @@ class Data_master extends My_Controller {
         $this->db->where('nip', $nip);
         $this->db->delete('pendamping_swk');
 
+        $this->db->where('nip', $nip);
+        $this->db->delete('pendamping_kecamatan');
+
         if($this->db->trans_status()) {
             $this->db->trans_commit();
 
             echo json_encode(array(
                 'status'  => TRUE,
-                'message' => 'Pendamping berhasil dihapus.'
+                'message' => 'Data penugasan pendamping berhasil dihapus.'
             ));
         }
         else {

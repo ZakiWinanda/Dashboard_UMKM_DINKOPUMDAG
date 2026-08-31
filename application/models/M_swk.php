@@ -141,7 +141,14 @@ class M_swk extends CI_Model
     {
         if (empty($rows)) return [];
         try {
-            $api_swk = $this->get_api_swk();
+            // Ambil NIP dari session; admin/pimpinan tidak filter (null = semua SWK)
+            $monev_swk   = $this->session->userdata('monev_swk');
+            $role        = $monev_swk['role'] ?? $this->session->userdata('role');
+            $nip_session = ($role === 'administrator' || $role === 'pimpinan')
+                ? null
+                : ($monev_swk['nip'] ?? $this->session->userdata('nip'));
+
+            $api_swk = $this->get_api_swk(100, $nip_session);
             if (!empty($api_swk)) {
                 $apiMap = [];
                 foreach ($api_swk as $item) {
@@ -155,7 +162,9 @@ class M_swk extends CI_Model
                     }
                 }
             }
-        } catch (Exception $e) {}
+        } catch (\Throwable $e) {
+            log_message('error', 'M_swk::_enrich_with_api error: ' . $e->getMessage());
+        }
 
         return $rows;
     }
@@ -194,22 +203,30 @@ class M_swk extends CI_Model
     }
 
     /**
-     * Mengambil daftar nama SWK dari API
+     * Mengambil daftar SWK dari API.
+     * @param int         $per_page Jumlah data per halaman (default 100, maks 500)
+     * @param string|null $nip      NIP pendamping untuk filter — null = ambil semua (admin/pimpinan)
      */
-    public function get_api_swk($per_page = 100){
-       $token = $this->get_api_token();
+    public function get_api_swk($per_page = 100, $nip = null)
+    {
+        $token = $this->get_api_token();
         if (!$token) {
             return [];
         }
 
         $baseUrl = $this->api_client->get_base_url();
-        $url = $baseUrl . '/integration/swk?' . http_build_query([
-            'search'             => '',
-            'updated_at_start'   => '',
-            'updated_at_end'     => '',
-            'per_page'           => $per_page,
-            'page'               => 1
-        ]);
+
+        // Bangun query params; kirim nip hanya jika disediakan
+        $params = [
+            'search'   => '',
+            'per_page' => $per_page,
+            'page'     => 1,
+        ];
+        if (!empty($nip)) {
+            $params['nip'] = $nip;
+        }
+
+        $url = $baseUrl . '/integration/swk?' . http_build_query($params);
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -228,8 +245,7 @@ class M_swk extends CI_Model
         $response = curl_exec($curl);
         curl_close($curl);
 
-        $result = json_decode($response, true);
-
+        $result   = json_decode($response, true);
         $list_swk = [];
         if (isset($result['data']['data']) && is_array($result['data']['data'])) {
             foreach ($result['data']['data'] as $item) {
@@ -277,12 +293,16 @@ class M_swk extends CI_Model
         }
 
         if (empty($rows)) {
-            $rows = $this->db
-                ->select('idswk, api_swk_id, nama_swk')
-                ->where('aktif', 1)
-                ->order_by('nama_swk', 'ASC')
-                ->get('m_swk')
-                ->result_array();
+            if ($role == 'administrator' || $role == 'pimpinan') {
+                $rows = $this->db
+                    ->select('idswk, api_swk_id, nama_swk')
+                    ->where('aktif', 1)
+                    ->order_by('nama_swk', 'ASC')
+                    ->get('m_swk')
+                    ->result_array();
+            } else {
+                return [];
+            }
         }
 
         return $this->_enrich_with_api_array($rows);
@@ -343,7 +363,14 @@ class M_swk extends CI_Model
     {
         if (empty($rows)) return [];
         try {
-            $api_swk = $this->get_api_swk();
+            // Ambil NIP dari session; admin/pimpinan tidak filter (null = semua SWK)
+            $monev_swk   = $this->session->userdata('monev_swk');
+            $role        = $monev_swk['role'] ?? $this->session->userdata('role');
+            $nip_session = ($role === 'administrator' || $role === 'pimpinan')
+                ? null
+                : ($monev_swk['nip'] ?? $this->session->userdata('nip'));
+
+            $api_swk = $this->get_api_swk(100, $nip_session);
             if (!empty($api_swk)) {
                 $apiMap = [];
                 foreach ($api_swk as $item) {
@@ -357,11 +384,12 @@ class M_swk extends CI_Model
                     }
                 }
             }
-        } catch (Exception $e) {}
+        } catch (\Throwable $e) {
+            log_message('error', 'M_swk::_enrich_with_api_array error: ' . $e->getMessage());
+        }
 
         return $rows;
     }
-
 
 
 }

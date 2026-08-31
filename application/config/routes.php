@@ -52,3 +52,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'login';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['capaian_bulanan'] = 'capaian_bulanan';
+$route['capaian_bulanan/(:any)'] = 'capaian_bulanan/$1';
+$route['input_bulanan'] = 'input_bulanan';
+$route['input_bulanan/(:any)'] = 'input_bulanan/$1';
+

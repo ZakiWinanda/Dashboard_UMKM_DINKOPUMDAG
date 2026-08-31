@@ -2,10 +2,10 @@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <div class="row align-items-center">
-            <!-- Dropdown SWK -->
+            <!-- Dropdown SWK / Kecamatan -->
             <div class="col-md-5 col-sm-12 mb-2">
                 <select name="pilih_swk" id="pilih_swk" class="form-control select2" style="width: 100%;">
-                    <option value="">- Pilih SWK -</option>
+                    <option value="">- Pilih <?= (!empty($is_pendamping_kecamatan)) ? 'Kecamatan' : 'SWK' ?> -</option>
                     <?php if (!empty($list_swk)): ?>
                         <?php foreach ($list_swk as $swk): ?>
                             <?php 

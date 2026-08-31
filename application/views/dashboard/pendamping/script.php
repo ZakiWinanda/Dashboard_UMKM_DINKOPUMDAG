@@ -37,7 +37,7 @@
                 }
 
                 isiKPI(res);
-                isiSwk(res.swk || []);
+                isiSwk(res.swk || [], res.is_kecamatan);
                 isiMonitoring(res.monitoring || []);
             },
             error: function () {
@@ -59,6 +59,19 @@
         if (isNaN(nilaikinerja)) nilaikinerja = 0;
         if (nilaikinerja > 100) nilaikinerja = 100;
 
+        if(r.label_wilayah) {
+            $("#label_total_wilayah").text(r.label_wilayah);
+            $("#label_daftar_wilayah").text("Daftar " + r.label_wilayah);
+            $("#th_nama_wilayah").text("Nama " + r.label_wilayah);
+            if(r.is_kecamatan) {
+                $("#icon_total_wilayah").removeClass('fa-store').addClass('fa-map-marker-alt');
+                $("#th_stan").hide();
+            } else {
+                $("#icon_total_wilayah").removeClass('fa-map-marker-alt').addClass('fa-store');
+                $("#th_stan").show();
+            }
+        }
+
         $("#total_swk").text(r.total_swk);
         $("#sudah").text(r.sudah);
         $("#belum").text(r.belum);
@@ -69,51 +82,40 @@
             .text(nilaikinerja + "%");
     }
 
-    function isiSwk(data)
+    function isiSwk(data, is_kecamatan)
     {
         var html='';
         if(data.length===0){
             html+='<tr>';
             html+='<td colspan="5" class="text-center text-muted">';
-            html+='Belum ada data SWK';
+            html+='Belum ada data ' + (is_kecamatan ? 'Kecamatan' : 'SWK');
             html+='</td>';
             html+='</tr>';
         }
         else{
             $.each(data,function(i,row){
                 var badge='';
-                var tombol='';
 
                 if(parseInt(row.status)===1){
                     badge='<span class="badge badge-success">Sudah</span>';
-                    tombol=
-                    '<button class="btn btn-warning btn-sm btn-edit" '+
-                    'data-idperform="'+row.idperform+'" '+
-                    'data-idswk="'+row.idswk+'">'+
-                    '<i class="fa fa-edit"></i> Edit'+
-                    '</button>';
-
                 }
                 else{
                     badge='<span class="badge badge-danger">Belum</span>';
-                    tombol=
-                    '<button class="btn btn-primary btn-sm btn-input" '+
-                    'data-idswk="'+row.idswk+'">'+
-                    '<i class="fa fa-plus"></i> Isi'+
-                    '</button>';
                 }
                 
                 html+='<tr>';
-                html+='<td>'+(i+1)+'</td>';
+                html+='<td class="text-center">'+(i+1)+'</td>';
                 html+='<td>';
-                html+='<strong>'+row.nama_swk+'</strong>';
+                html+='<strong>'+(row.nama_kecamatan || row.nama_swk)+'</strong>';
                 
-                if(row.alamat){
+                if(row.alamat && row.alamat !== '-'){
                     html+='<br><small class="text-muted">'+row.alamat+'</small>';
                 }
 
                 html+='</td>';
-                html+='<td class="text-center">'+row.stan+'</td>';
+                if(!is_kecamatan) {
+                    html+='<td class="text-center">'+row.stan+'</td>';
+                }
                 html+='<td class="text-center">'+badge+'</td>';
                 html+='<td class="text-center">'+row.persentase+'%</td>';
                 html+='</tr>';

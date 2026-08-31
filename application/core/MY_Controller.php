@@ -10,6 +10,8 @@ class MY_Controller extends CI_Controller
     protected $is_koordinator_pendamping;
     protected $is_pimpinan;
     protected $is_admin;
+    protected $is_pendamping_swk;
+    protected $is_pendamping_kecamatan;
 
     public function __construct()
     {
@@ -32,14 +34,24 @@ class MY_Controller extends CI_Controller
         ->where('nip_koordinator', $this->nip)
         ->count_all_results('koordinator_pendamping') > 0;
 
+        // Cek apakah NIP terdaftar sebagai Pendamping SWK
+        $this->is_pendamping_swk = $this->db
+        ->where('nip', $this->nip)
+        ->count_all_results('pendamping_swk') > 0;
+
+        // Jika role pendamping dan TIDAK terdaftar di pendamping_swk, maka adalah Pendamping Kecamatan
+        $this->is_pendamping_kecamatan = (!$this->is_pendamping_swk && $this->role == 'pendamping');
+
         $this->load->vars(array(
-            'user' => $this->user,
-            'nama' => $this->nama,
-            'nip'  => $this->nip,
-            'role' => $this->role,
-            'is_pimpinan' => $this->is_pimpinan,
-            'is_admin' => $this->is_admin,
-            'is_koordinator_pendamping'=>$this->is_koordinator_pendamping
+            'user'                      => $this->user,
+            'nama'                      => $this->nama,
+            'nip'                       => $this->nip,
+            'role'                      => $this->role,
+            'is_pimpinan'               => $this->is_pimpinan,
+            'is_admin'                  => $this->is_admin,
+            'is_koordinator_pendamping' => $this->is_koordinator_pendamping,
+            'is_pendamping_swk'         => $this->is_pendamping_swk,
+            'is_pendamping_kecamatan'   => $this->is_pendamping_kecamatan
         ));
     }
 }

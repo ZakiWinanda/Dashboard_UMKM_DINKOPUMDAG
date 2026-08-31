@@ -19,8 +19,8 @@
                                 <th>NIP / NIK</th>
                                 <th>NAMA</th>
                                 <th>NO. TELP</th>
-                                <th>JUMLAH SWK</th>
-                                <th>NAMA SWK</th>
+                                <th>JENIS PENDAMPING</th>
+                                <th>PENUGASAN (SWK / KECAMATAN)</th>
                                 <th>AKSI</th>
                             </tr>
                         </thead>
@@ -62,8 +62,22 @@
                     </div>
 
                     <div class="form-group">
-                        <label>SWK</label>
-                        <select class="form-control" name="idswk[]" id="idswk" multiple required>
+                        <label>Jenis Pendamping</label>
+                        <div class="d-flex">
+                            <div class="custom-control custom-radio mr-4">
+                                <input class="custom-control-input" type="radio" id="jenis_swk" name="jenis_pendamping" value="swk" checked>
+                                <label for="jenis_swk" class="custom-control-label font-weight-normal"><i class="fa fa-store text-info"></i> Pendamping SWK</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input" type="radio" id="jenis_kecamatan" name="jenis_pendamping" value="kecamatan">
+                                <label for="jenis_kecamatan" class="custom-control-label font-weight-normal"><i class="fa fa-map-marker-alt text-success"></i> Pendamping Kecamatan</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="div_swk">
+                        <label>Penugasan SWK</label>
+                        <select class="form-control" name="idswk[]" id="idswk" multiple style="width: 100%;">
                             <?php
                             $swk = $this->db
                             ->where('aktif',1)
@@ -78,11 +92,30 @@
                             <?php } ?>
                         </select>
                     </div>
+
+                    <div class="form-group" id="div_kecamatan" style="display:none;">
+                        <label>Penugasan Kecamatan</label>
+                        <select class="form-control" name="kecamatan[]" id="kecamatan" multiple style="width: 100%;">
+                            <?php
+                            $list_kec = [
+                                'ASEM ROWO', 'BENOWO', 'BUBUTAN', 'BULAK', 'DUKUH PAKIS',
+                                'GAYUNGAN', 'GENTENG', 'GUBENG', 'GUNUNG ANYAR', 'JAMBANGAN',
+                                'KARANG PILANG', 'KENJERAN', 'KREMBANGAN', 'LAKARSANTRI', 'MULYOREJO',
+                                'PABEAN CANTIAN', 'PAKAL', 'RUNGKUT', 'SAMBIKEREP', 'SAWAHAN',
+                                'SEMAMPIR', 'SIMOKERTO', 'SUKOLILO', 'SUKOMANUNGGAL', 'TAMBAKSARI',
+                                'TANDES', 'TEGALSARI', 'TENGGILIS MEJOYO', 'WIYUNG', 'WONOCOLO', 'WONOKROMO'
+                            ];
+                            foreach($list_kec as $k){
+                                ?>
+                                <option value="<?=$k?>"><?=$k?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Tutup</button>
-                    <button type="submit" id="btnSimpan" class="btn btn-primary btn-flat"><i class="fa fa-save"></i>Simpan</button>
+                    <button type="submit" id="btnSimpan" class="btn btn-primary btn-flat"><i class="fa fa-save"></i> Simpan</button>
                 </div>
             </form>
         </div>
@@ -100,21 +133,40 @@
             type:"POST"
         },
         columns:[
-        {data:'no', orderable: false},
-        {data:'nip'},
-        {data:'nama'},
-        {data:'no_tlp'},
-        {data:'jumlah_swk', orderable: false, class: 'text-center'},
-        {data:'swk', orderable: false},
-        {data:'aksi', orderable: false, class: 'text-center'}
+            {data:'no', orderable: false},
+            {data:'nip'},
+            {data:'nama'},
+            {data:'no_tlp'},
+            {data:'jenis_pendamping', class: 'text-center'},
+            {data:'penugasan', orderable: false},
+            {data:'aksi', orderable: false, class: 'text-center'}
         ]
     });
+
+    $('input[name="jenis_pendamping"]').change(function(){
+        toggleJenisForm($(this).val());
+    });
+
+    function toggleJenisForm(jenis) {
+        if(jenis === 'kecamatan') {
+            $('#div_swk').hide();
+            $('#div_kecamatan').show();
+        } else {
+            $('#div_kecamatan').hide();
+            $('#div_swk').show();
+        }
+    }
 
     function tambah() {
         $('#formPendamping')[0].reset();
         $('#mode').val('tambah');
-        $('#nik').prop('readonly',false);
-        $('#judulModal').html('<i class="fa fa-plus"></i> Tambah Pendamping');
+        $('#pilih_nip').val('').trigger('change').prop('disabled', false);
+        $('#nip_hidden').val('');
+        $('#jenis_swk').prop('checked', true);
+        toggleJenisForm('swk');
+        $('#idswk').val([]).trigger('change');
+        $('#kecamatan').val([]).trigger('change');
+        $('#modalPendampingLabel').html('<i class="fa fa-plus"></i> Tambah Pendamping');
         $('#modalPendamping').modal('show');
     }
 
@@ -130,7 +182,7 @@
                         'Gagal',
                         'Data tidak ditemukan.',
                         'warning'
-                        );
+                    );
                     return;
                 }
                 $('#formPendamping')[0].reset();
@@ -141,8 +193,20 @@
                 .prop('disabled',true);
                 $('#nip_hidden')
                 .val(res.nip);
+
+                if(res.tipe === 'kecamatan') {
+                    $('#jenis_kecamatan').prop('checked', true);
+                    toggleJenisForm('kecamatan');
+                } else {
+                    $('#jenis_swk').prop('checked', true);
+                    toggleJenisForm('swk');
+                }
+
                 $('#idswk')
                 .val(res.idswk)
+                .trigger('change');
+                $('#kecamatan')
+                .val(res.kecamatan)
                 .trigger('change');
                 $('#modalPendampingLabel').html('<i class="fa fa-edit"></i> Edit Pendamping');
                 $('#modalPendamping').modal('show');
@@ -150,7 +214,7 @@
         });
     }
 
-    $('#nip').select2({
+    $('#pilih_nip').select2({
         width: '100%',
         dropdownParent: $('#modalPendamping'),
         placeholder: 'Pilih Pendamping',
@@ -161,6 +225,13 @@
         width: '100%',
         dropdownParent: $('#modalPendamping'),
         placeholder: 'Pilih SWK',
+        allowClear: true
+    });
+
+    $('#kecamatan').select2({
+        width: '100%',
+        dropdownParent: $('#modalPendamping'),
+        placeholder: 'Pilih Kecamatan',
         allowClear: true
     });
 
@@ -179,7 +250,13 @@
                         'Berhasil',
                         r.message,
                         'success'
-                        );
+                    );
+                } else {
+                    Swal.fire(
+                        'Gagal',
+                        r.message || 'Gagal menyimpan data.',
+                        'error'
+                    );
                 }
             }
         });
@@ -188,8 +265,8 @@
     function hapus(nip, nama)
     {
         Swal.fire({
-            title: 'Hapus Pendamping?',
-            html: 'Seluruh relasi SWK milik <b>'+nama+'</b> akan dihapus.',
+            title: 'Hapus Penugasan Pendamping?',
+            html: 'Seluruh relasi SWK dan Kecamatan milik <b>'+nama+'</b> akan dihapus.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc3545',
@@ -219,7 +296,7 @@
                                 'Berhasil',
                                 res.message,
                                 'success'
-                                );
+                            );
                             $('#tabel').DataTable().ajax.reload(null,false);
                         }
                         else {
@@ -227,7 +304,7 @@
                                 'Gagal',
                                 res.message,
                                 'warning'
-                                );
+                            );
                         }
                     },
                     error:function(){
@@ -235,7 +312,7 @@
                             'Error',
                             'Terjadi kesalahan pada server.',
                             'error'
-                            );
+                        );
                     }
                 });
             }

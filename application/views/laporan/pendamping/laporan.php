@@ -17,7 +17,7 @@
       				  <div class="form-group row mb-2">
       					<div class="col-sm-12">
                   <select class="form-control" name="pilih_swk" required="true">
-                    <option value="">- Pilih SWK -</option>
+                    <option value="">- Pilih <?= (!empty($is_pendamping_kecamatan)) ? 'Kecamatan' : 'SWK' ?> -</option>
                     <?php foreach($swk as $row){ ?>
                       <option value="<?=$row->idswk;?>">
                         <?=$row->nama_swk;?>

@@ -1,6 +1,6 @@
 <div class="card card-primary collapsed-card">
 	<div class="card-header">
-		<b>Daftar SWK</b>
+		<b id="label_daftar_wilayah"><?= !empty($is_pendamping_kecamatan) ? 'Daftar Kecamatan' : 'Daftar SWK' ?></b>
 	    <div class="card-tools">
 	      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
 	      </button>
@@ -11,15 +11,15 @@
 			<thead>
 				<tr class="text-center">
 					<th>No</th>
-					<th>Nama SWK</th>
-					<th>Stan</th>
-					<th >Status</th>
+					<th id="th_nama_wilayah"><?= !empty($is_pendamping_kecamatan) ? 'Nama Kecamatan' : 'Nama SWK' ?></th>
+					<th id="th_stan" <?= !empty($is_pendamping_kecamatan) ? 'style="display:none;"' : '' ?>>Stan</th>
+					<th>Status</th>
 					<th>Skor</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td colspan="6" align="center">Belum ada data</td>
+					<td colspan="5" align="center">Belum ada data</td>
 				</tr>
 			</tbody>
 		</table>

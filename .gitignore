@@ -1,5 +1,9 @@
 # CodeIgniter ignore
 application/logs/log-*.php
+application/cache/*
+!application/cache/index.html
+captcha/*.jpg
+__pycache__/
 
 # OS and Editor files
 .DS_Store
@@ -7,3 +11,4 @@ Thumbs.db
 .idea/
 .vscode/
 *.tmp
+

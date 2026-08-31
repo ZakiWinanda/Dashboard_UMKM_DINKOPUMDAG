@@ -94,23 +94,64 @@
 
     function buildTable(res)
     {
-        var filter = $('[name=filter_bulan_tahun]').val();
+        var filter = $('[name=filter_bulan_tahun]').val() || '';
         var pecah = filter.split('-');
 
-        var bulan = pecah[0];
-        var tahun = pecah[1];
-
-        $('#headerOmset').html('<th width="180">Tanggal</th>');
-        $('#headerKunjungan').html('<th width="180">Tanggal</th>');
-
-        $('#rowOmset').html('<th>Omset</th>');
-        $('#rowKunjungan').html('<th>Kunjungan</th>');
+        var bulan = pecah[0] ? pad(parseInt(pecah[0], 10)) : '01';
+        var tahun = pecah[1] || res.tahun || '<?= date("Y") ?>';
 
         totalOmset = res.total_omset_harian;
         totalKunjungan = res.total_kunjungan_harian;
 
         $('#totalOmset').html(rupiah(totalOmset));
         $('#totalKunjungan').html(totalKunjungan);
+
+        if (res.is_kecamatan) {
+            $('#headerOmset').html('<th width="150">Bulan</th>');
+            $('#headerKunjungan').html('<th width="150">Bulan</th>');
+
+            $('#rowOmset').html('<th>Omset</th>');
+            $('#rowKunjungan').html('<th>Kunjungan</th>');
+
+            var namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+            var omsetBln = {};
+            var kunjunganBln = {};
+            $.each(res.omset, function(i, e){
+                omsetBln[parseInt(e.bulan, 10)] = e.omset;
+            });
+            $.each(res.kunjungan, function(i, e){
+                kunjunganBln[parseInt(e.bulan, 10)] = e.jumlah;
+            });
+
+            for (var m = 1; m <= 12; m++) {
+                var labelBln = namaBulan[m - 1];
+                var isCurBln = (parseInt(bulan, 10) === m);
+                var bgClass  = isCurBln ? 'bg-primary text-white' : '';
+
+                $('#headerOmset').append('<td class="text-center ' + bgClass + '">' + labelBln + '</td>');
+                $('#headerKunjungan').append('<td class="text-center ' + bgClass + '">' + labelBln + '</td>');
+
+                var nilaiOmset = (typeof omsetBln[m] !== 'undefined' && parseFloat(omsetBln[m]) > 0) ? rupiah(omsetBln[m]) : '-';
+                var nilaiKunjungan = (typeof kunjunganBln[m] !== 'undefined' && parseInt(kunjunganBln[m], 10) > 0) ? kunjunganBln[m] : '-';
+
+                $('#rowOmset').append('<td class="text-center ' + bgClass + '">' + nilaiOmset + '</td>');
+                $('#rowKunjungan').append('<td class="text-center ' + bgClass + '">' + nilaiKunjungan + '</td>');
+            }
+
+            $('#headerOmset').append('<th class="text-center bg-dark text-white">Total ' + tahun + '</th>');
+            $('#headerKunjungan').append('<th class="text-center bg-dark text-white">Total ' + tahun + '</th>');
+
+            $('#rowOmset').append('<td class="text-center font-weight-bold bg-light text-primary">Rp ' + rupiah(totalOmset) + '</td>');
+            $('#rowKunjungan').append('<td class="text-center font-weight-bold bg-light text-primary">' + totalKunjungan + '</td>');
+            return;
+        }
+
+        $('#headerOmset').html('<th width="180">Tanggal</th>');
+        $('#headerKunjungan').html('<th width="180">Tanggal</th>');
+
+        $('#rowOmset').html('<th>Omset</th>');
+        $('#rowKunjungan').html('<th>Kunjungan</th>');
 
         var omset = {};
         var kunjungan = {};
@@ -141,12 +182,12 @@
                 '<td class="text-center '+bgClass+'">'+namaHari[hari]+'<br>'+i+'</td>'
                 );
 
-            var nilaiOmset='';
-            if(typeof omset[i] !== 'undefined')
+            var nilaiOmset='-';
+            if(typeof omset[i] !== 'undefined' && parseFloat(omset[i]) > 0)
                 nilaiOmset = rupiah(omset[i]);
 
-            var nilaiKunjungan='';
-            if(typeof kunjungan[i] !== 'undefined')
+            var nilaiKunjungan='-';
+            if(typeof kunjungan[i] !== 'undefined' && parseInt(kunjungan[i], 10) > 0)
                 nilaiKunjungan = kunjungan[i];
 
             $('#rowOmset').append(

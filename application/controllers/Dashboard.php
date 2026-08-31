@@ -59,19 +59,25 @@ class Dashboard extends MY_Controller {
             $nip = $pendamping;
         }
 
+        $is_kecamatan   = !empty($nip) ? $this->dashboard_petugas->isPendampingKecamatan($nip) : false;
+        $total_wilayah  = !empty($nip) ? $this->dashboard_petugas->totalWilayah($nip) : $this->dashboard_petugas->totalSwk();
+        $daftar_wilayah = !empty($nip) ? $this->dashboard_petugas->daftarWilayah($nip, $tahun, $bulan) : $this->dashboard_petugas->daftarSwk('', $tahun, $bulan);
+
         $data = array(
-            'status'      => true,
-            'tahun'       => $tahun,
-            'bulan'       => $bulan,
-            'total_swk'   => $this->dashboard_petugas->totalSwk($nip),
-            'sudah'       => $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan),
-            'belum'       => $this->dashboard_petugas->belumLapor($nip, $tahun, $bulan),
-            'progress'    => $this->dashboard_petugas->progress($nip, $tahun, $bulan),
-            'nilaikinerja'    => $this->dashboard_petugas->getNilaiKinerjaPendamping($nip, $tahun, $bulan),
-            'swk'         => $this->dashboard_petugas->daftarSwk($nip, $tahun, $bulan),
-            'monitoring'  => $this->dashboard_petugas->monitoringTerakhir($nip),
-            'belum_lapor' => $this->dashboard_petugas->swkBelumLapor($nip, $tahun, $bulan),
-            'last_update' => $this->dashboard_petugas->lastUpdate($nip, $tahun, $bulan)
+            'status'        => true,
+            'tahun'         => $tahun,
+            'bulan'         => $bulan,
+            'is_kecamatan'  => $is_kecamatan,
+            'label_wilayah' => $is_kecamatan ? 'Kecamatan' : 'SWK',
+            'total_swk'     => $total_wilayah,
+            'sudah'         => $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan),
+            'belum'         => $is_kecamatan ? max(0, $total_wilayah - $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan)) : $this->dashboard_petugas->belumLapor($nip, $tahun, $bulan),
+            'progress'      => $this->dashboard_petugas->progress($nip, $tahun, $bulan),
+            'nilaikinerja'  => $this->dashboard_petugas->getNilaiKinerjaPendamping($nip, $tahun, $bulan),
+            'swk'           => $daftar_wilayah,
+            'monitoring'    => $this->dashboard_petugas->monitoringTerakhir($nip),
+            'belum_lapor'   => $this->dashboard_petugas->swkBelumLapor($nip, $tahun, $bulan),
+            'last_update'   => $this->dashboard_petugas->lastUpdate($nip, $tahun, $bulan)
         );
 
         $this->output
@@ -112,17 +118,23 @@ class Dashboard extends MY_Controller {
             return;
         }
 
+        $is_kecamatan   = $this->dashboard_petugas->isPendampingKecamatan($nip);
+        $total_wilayah  = $this->dashboard_petugas->totalWilayah($nip);
+        $daftar_wilayah = $this->dashboard_petugas->daftarWilayah($nip, $tahun, $bulan);
+
         $data = array(
-            'status'      => true,
-            'tahun'       => $tahun,
-            'bulan'       => $bulan,
-            'total_swk'   => $this->dashboard_petugas->totalSwk($nip),
-            'sudah'       => $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan),
-            'belum'       => $this->dashboard_petugas->belumLapor($nip, $tahun, $bulan),
-            'progress'    => $this->dashboard_petugas->progress($nip, $tahun, $bulan),
-            'nilaikinerja'    => $this->dashboard_petugas->getNilaiKinerjaPendamping($nip, $tahun, $bulan),
-            'swk'         => $this->dashboard_petugas->daftarSwk($nip, $tahun, $bulan),
-            'monitoring'  => $this->dashboard_petugas->monitoringTerakhir($nip)
+            'status'        => true,
+            'tahun'         => $tahun,
+            'bulan'         => $bulan,
+            'is_kecamatan'  => $is_kecamatan,
+            'label_wilayah' => $is_kecamatan ? 'Kecamatan' : 'SWK',
+            'total_swk'     => $total_wilayah,
+            'sudah'         => $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan),
+            'belum'         => $is_kecamatan ? max(0, $total_wilayah - $this->dashboard_petugas->sudahLapor($nip, $tahun, $bulan)) : $this->dashboard_petugas->belumLapor($nip, $tahun, $bulan),
+            'progress'      => $this->dashboard_petugas->progress($nip, $tahun, $bulan),
+            'nilaikinerja'  => $this->dashboard_petugas->getNilaiKinerjaPendamping($nip, $tahun, $bulan),
+            'swk'           => $daftar_wilayah,
+            'monitoring'    => $this->dashboard_petugas->monitoringTerakhir($nip)
         );
 
         $this->output

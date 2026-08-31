@@ -26,9 +26,22 @@ class Laporan extends My_Controller
 		else {
 			if($param=='' || $param=='index') {
 				$data['pendamping'] = $this->is_pimpinan || $this->is_admin ? $this->M_pengguna->get_pendamping() : '';
-			    $data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_pendamping($this->nip);
 
-				$data['title'] = 'LAPORAN EVALUASI SWK';
+				if (!empty($this->is_pendamping_kecamatan)) {
+					$this->load->model('M_kecamatan');
+					$raw_kec = $this->M_kecamatan->get_kecamatan_by_user($this->nip, $this->role);
+					$data['swk'] = array_map(function($k) {
+						$nama = is_object($k) ? $k->nama_kecamatan : ($k['nama_kecamatan'] ?? $k);
+						return (object)[
+							'idswk'    => $nama,
+							'nama_swk' => $nama
+						];
+					}, $raw_kec);
+					$data['title'] = 'LAPORAN EVALUASI KECAMATAN';
+				} else {
+					$data['swk'] = $this->is_pimpinan || $this->is_admin ? $this->M_swk->get_all() : $this->M_swk->get_by_pendamping($this->nip);
+					$data['title'] = 'LAPORAN EVALUASI SWK';
+				}
 		        $this->load->view('header', $data);
 		        if(file_exists(APPPATH.'views/'.$view.'/index.php')){
 					$this->load->view($view.'/index', $data);

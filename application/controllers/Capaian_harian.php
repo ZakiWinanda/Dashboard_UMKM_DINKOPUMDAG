@@ -17,8 +17,13 @@ class Capaian_harian extends MY_Controller
         $nip       = $monev_swk['nip'] ?? $this->session->userdata('nip');
         $role      = $monev_swk['role'] ?? $this->session->userdata('role');
 
-        // 1. Ambil list SWK berdasarkan NIP user yang login
+        if (!empty($this->is_pendamping_kecamatan)) {
+            redirect('capaian_bulanan');
+            return;
+        }
+
         $list_swk = $this->M_swk->get_swk_by_user($nip, $role);
+
         $data['list_swk']   = $list_swk;
         $data['swk']        = $list_swk;
         $data['pendamping'] = ($role == 'administrator' || $role == 'pimpinan' || $role == 'koordinator_pendamping') ? $this->M_pengguna->get_pendamping() : [];
@@ -57,14 +62,29 @@ class Capaian_harian extends MY_Controller
         $idswk   = trim((string)$this->input->post('idswk'));
         $periode = trim((string)$this->input->post('filter_bulan_tahun'));
 
+        $monev_swk = $this->session->userdata('monev_swk');
+        $nip       = $monev_swk['nip'] ?? $this->session->userdata('nip');
+        $role      = $monev_swk['role'] ?? $this->session->userdata('role');
+
+        $is_pendamping_swk = $this->db
+            ->where('nip', $nip)
+            ->count_all_results('pendamping_swk') > 0;
+        $is_pendamping_kecamatan = (!$is_pendamping_swk && $role == 'pendamping');
+
         if (empty($idswk)) {
-            $monev_swk = $this->session->userdata('monev_swk');
-            $nip       = $monev_swk['nip'] ?? $this->session->userdata('nip');
-            $role      = $monev_swk['role'] ?? $this->session->userdata('role');
-            $list_swk  = $this->M_swk->get_swk_by_user($nip, $role);
-            if (!empty($list_swk)) {
-                $first = current($list_swk);
-                $idswk = is_array($first) ? ($first['idswk'] ?? $first['id'] ?? '') : ($first->idswk ?? $first->id ?? '');
+            if ($is_pendamping_kecamatan) {
+                $this->load->model('M_kecamatan');
+                $list_kec = $this->M_kecamatan->get_kecamatan_by_user($nip, $role);
+                if (!empty($list_kec)) {
+                    $first = current($list_kec);
+                    $idswk = is_object($first) ? $first->nama_kecamatan : ($first['nama_kecamatan'] ?? $first);
+                }
+            } else {
+                $list_swk = $this->M_swk->get_swk_by_user($nip, $role);
+                if (!empty($list_swk)) {
+                    $first = current($list_swk);
+                    $idswk = is_array($first) ? ($first['idswk'] ?? $first['id'] ?? '') : ($first->idswk ?? $first->id ?? '');
+                }
             }
         }
 
@@ -76,8 +96,42 @@ class Capaian_harian extends MY_Controller
         $bulan = isset($pecah[0]) ? (int)$pecah[0] : (int)date('m');
         $tahun = isset($pecah[1]) ? (int)$pecah[1] : (int)date('Y');
 
-        $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+        if ($is_pendamping_kecamatan) {
+            // Mode Rekap Bulanan untuk Kecamatan (12 Bulan dalam tahun berjalan)
+            $omset_bulanan     = $this->M_capaian_harian->getOmsetBulanan($idswk, $tahun);
+            $kunjungan_bulanan = $this->M_capaian_harian->getKunjunganBulanan($idswk, $tahun);
 
+            $total_omset     = 0;
+            $total_kunjungan = 0;
+            if (!empty($omset_bulanan)) {
+                foreach ($omset_bulanan as $r) {
+                    $total_omset += (float)$r->omset;
+                }
+            }
+            if (!empty($kunjungan_bulanan)) {
+                foreach ($kunjungan_bulanan as $r) {
+                    $total_kunjungan += (int)$r->jumlah;
+                }
+            }
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(array(
+                    'status'                 => TRUE,
+                    'is_kecamatan'           => TRUE,
+                    'idswk_terpilih'         => $idswk,
+                    'tahun'                  => $tahun,
+                    'bulan'                  => $bulan,
+                    'total_omset_harian'     => $total_omset,
+                    'total_kunjungan_harian' => $total_kunjungan,
+                    'omset'                  => $omset_bulanan,
+                    'kunjungan'              => $kunjungan_bulanan,
+                )));
+            return;
+        }
+
+        // Mode Rekap Harian untuk SWK
+        $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
         $omset     = [];
         $kunjungan = [];
         $total_omset_harian     = 0;
@@ -85,10 +139,7 @@ class Capaian_harian extends MY_Controller
 
         if (!empty($idswk)) {
             $omset     = $this->M_capaian_harian->getOmsetHarian($idswk, $bulan, $tahun);
-            $query_omset_debug = $this->db->last_query(); // Debug query
-
             $kunjungan = $this->M_capaian_harian->getKunjunganHarian($idswk, $bulan, $tahun);
-            $query_kunjungan_debug = $this->db->last_query(); // Debug query
 
             if (!empty($omset)) {
                 foreach ($omset as $r) {
@@ -107,9 +158,8 @@ class Capaian_harian extends MY_Controller
             ->set_content_type('application/json')
             ->set_output(json_encode(array(
                 'status'                 => TRUE,
+                'is_kecamatan'           => FALSE,
                 'idswk_terpilih'         => $idswk,
-                'debug_query_omset'      => $query_omset_debug ?? '',
-                'debug_query_kunjungan'  => $query_kunjungan_debug ?? '',
                 'jumlah_hari'            => $jumlah_hari,
                 'omset'                  => $omset,
                 'kunjungan'              => $kunjungan,

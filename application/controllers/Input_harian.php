@@ -13,6 +13,11 @@ class Input_harian extends MY_Controller {
 
     public function index()
     {
+        if (!empty($this->is_pendamping_kecamatan)) {
+            redirect('input_bulanan');
+            return;
+        }
+
         if ($this->is_pimpinan || $this->is_admin) {
             $list_swk = $this->M_swk->get_all_as_array();
         } else {
@@ -71,8 +76,24 @@ class Input_harian extends MY_Controller {
         $units = $this->M_unit_usaha->get_from_api($idswk_api);
 
         if (empty($units)) {
-            echo json_encode(['status' => false, 'message' => 'Tidak ada unit usaha aktif untuk SWK ini.']);
-            return;
+            $is_kec = $this->db->where('nama_kecamatan', $idswk_lokal)->count_all_results('pendamping_kecamatan') > 0
+                      || !empty($this->is_pendamping_kecamatan);
+            if ($is_kec) {
+                $nama_kec = !empty($idswk_lokal) ? $idswk_lokal : $idswk_api;
+                $units = [
+                    [
+                        'id'           => 'IR-' . strtoupper(substr(md5($nama_kec), 0, 8)),
+                        'namaUsaha'    => 'Industri Rumahan ' . $nama_kec,
+                        'kodeUsahaSwk' => 'IR-' . strtoupper(substr($nama_kec, 0, 3)),
+                        'namaStand'    => 'Kecamatan ' . $nama_kec,
+                        'namaPedagang' => 'Pelaku Usaha ' . $nama_kec,
+                        'nikPedagang'  => '-'
+                    ]
+                ];
+            } else {
+                echo json_encode(['status' => false, 'message' => 'Tidak ada unit usaha aktif untuk SWK ini.']);
+                return;
+            }
         }
 
         $omset_map     = $this->M_unit_usaha->getOmsetBulan($idswk_lokal, $bulan, $tahun);
@@ -97,7 +118,7 @@ class Input_harian extends MY_Controller {
     }
 
     /**
-     * Unduh Template Native Excel Modern (.xlsx) per Hari dengan Nama SWK & Nama User
+     * Unduh Template Native Excel Modern (.xlsx) per Hari (SWK) / per Bulan (Kecamatan)
      */
     public function download_template()
     {
@@ -122,14 +143,31 @@ class Input_harian extends MY_Controller {
             $idswk_lokal = $swkRow->idswk;
             if (!empty($swkRow->api_swk_id)) $idswk_api = $swkRow->api_swk_id;
             if (!empty($swkRow->nama_swk))   $nama_swk   = $swkRow->nama_swk;
+        } else {
+            $nama_swk = !empty($idswk_lokal) ? $idswk_lokal : ($idswk_api ?: 'Kecamatan');
         }
 
         $parts = explode('-', $tanggal);
         $tahun = (int)($parts[0] ?? date('Y'));
         $bulan = (int)($parts[1] ?? date('m'));
 
-        $units         = $this->M_unit_usaha->get_from_api($idswk_api);
+        $units = $this->M_unit_usaha->get_from_api($idswk_api);
+        if (empty($units)) {
+            $nama_kec = !empty($idswk_lokal) ? $idswk_lokal : $idswk_api;
+            $units = [
+                [
+                    'id'           => 'IR-' . strtoupper(substr(md5($nama_kec), 0, 8)),
+                    'namaUsaha'    => 'Industri Rumahan ' . $nama_kec,
+                    'kodeUsahaSwk' => 'IR-' . strtoupper(substr($nama_kec, 0, 3)),
+                    'namaStand'    => 'Kecamatan ' . $nama_kec,
+                    'namaPedagang' => 'Pelaku Usaha ' . $nama_kec,
+                    'nikPedagang'  => '-'
+                ]
+            ];
+        }
+
         $omset_map     = $this->M_unit_usaha->getOmsetBulan($idswk_lokal, $bulan, $tahun);
+        $kunjungan_map = $this->M_unit_usaha->getKunjunganBulan($idswk_lokal, $bulan, $tahun);
         $kunjungan_map = $this->M_unit_usaha->getKunjunganBulan($idswk_lokal, $bulan, $tahun);
 
         $tmpXlsx = tempnam(sys_get_temp_dir(), 'xlsx_') . '.xlsx';
